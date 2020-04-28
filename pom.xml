@@ -82,6 +82,16 @@
             <artifactId>commons-text</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <!-- Bouncy Castle Crypto软件包是密码算法的Java实现 -->
+        <!--<dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
+        </dependency>-->
 
         <!-- Java 8 之前版本的默认时间替代api依赖 -->
         <dependency>
