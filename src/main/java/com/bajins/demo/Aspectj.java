@@ -6,6 +6,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -95,6 +96,8 @@ public class Aspectj {
                 if (returnMap != null && returnMap.size() > 0) {
                     objectNode.putPOJO(parameterName, returnMap);
                 }
+            } else if (arg instanceof HttpServletResponse) {
+                continue;
             } else {
                 objectNode.putPOJO(parameterName, arg);
             }
@@ -133,6 +136,8 @@ public class Aspectj {
                 if (returnMap != null && returnMap.size() > 0) {
                     objectNode.putPOJO(parameterName, returnMap);
                 }
+            } else if (arg instanceof HttpServletResponse) {
+                continue;
             } else {
                 objectNode.putPOJO(parameterName, arg);
             }
