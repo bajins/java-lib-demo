@@ -102,6 +102,12 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.59</version>
         </dependency>-->
+        <!-- bean操作 -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.3</version>
+        </dependency>
 
         <!-- Java 8 之前版本的默认时间替代api依赖 -->
         <dependency>

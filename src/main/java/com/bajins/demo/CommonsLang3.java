@@ -1,5 +1,6 @@
 package com.bajins.demo;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -141,6 +142,26 @@ public class CommonsLang3 {
         StringUtils.substringBetween("yabczyabcz", "y", "z");//---"abc"
 
         String randomAlphanumeric = RandomStringUtils.randomAlphanumeric(5);
+
+        // 检查所有元素是否为空
+        // 如果有一个元素为空返回false，所有元素不为空或元素为empty返回true
+        ObjectUtils.allNotNull("values");
+
+        // 检查元素是否为空
+        // 如果有一个元素不为空返回true
+        ObjectUtils.anyNotNull("values");
+
+        // 比较两个对象,返回一个int值
+        //ObjectUtils.compare(c1, c2);
+
+        // 如果对象为空返回一个默认值
+        ObjectUtils.defaultIfNull("object", "defaultValue");
+
+        // 返回数组中第一个不为空的值
+        ObjectUtils.firstNonNull("values");
+
+        // 判断两个对象不相等，返回一个boolean
+        ObjectUtils.notEqual("object1", "object2");
 
     }
 }

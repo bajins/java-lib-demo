@@ -40,7 +40,7 @@ import java.util.Map.Entry;
  *
  * @author Administrator
  */
-public class HttpClient {
+public class HttpClientApache {
 
     /**
      * 创建忽略ssl验证HttpClient
