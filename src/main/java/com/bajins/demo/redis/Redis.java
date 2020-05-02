@@ -1,4 +1,4 @@
-package com.bajins.demo;
+package com.bajins.demo.redis;
 
 import org.springframework.data.redis.core.RedisTemplate;
 

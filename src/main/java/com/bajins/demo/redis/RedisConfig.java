@@ -1,4 +1,4 @@
-package com.bajins.demo;
+package com.bajins.demo.redis;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
