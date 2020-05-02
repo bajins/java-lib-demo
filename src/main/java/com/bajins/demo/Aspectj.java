@@ -192,8 +192,11 @@ public class Aspectj {
      * @return java.lang.String
      */
     public static String getMethodByTarget(JoinPoint joinPoint) {
+        StringBuilder stringBuilder = new StringBuilder(joinPoint.getTarget().getClass().getName());
+        stringBuilder.append(".");
+        stringBuilder.append(joinPoint.getSignature().getName());
         // 类全路径
-        return joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName();
+        return stringBuilder.toString();
     }
 
     /**
@@ -203,8 +206,11 @@ public class Aspectj {
      * @return java.lang.String
      */
     public static String getMethodBySignature(JoinPoint joinPoint) {
+        StringBuilder stringBuilder = new StringBuilder(joinPoint.getSignature().getDeclaringTypeName());
+        stringBuilder.append(".");
+        stringBuilder.append(joinPoint.getSignature().getName());
         // 类全路径
-        return joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
+        return stringBuilder.toString();
     }
 
 }

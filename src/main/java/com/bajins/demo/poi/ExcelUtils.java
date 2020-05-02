@@ -1,7 +1,6 @@
 package com.bajins.demo.poi;
 
-import com.bajins.api.utils.poi.convert.ExportConvert;
-import com.bajins.api.utils.poi.pojo.ExportItem;
+import com.bajins.demo.poi.convert.ExportConvert;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;

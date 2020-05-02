@@ -27,9 +27,6 @@ import java.util.concurrent.Executors;
  * 腾讯云对象存储工具
  *
  * @author claer https://www.bajins.com
- * @program com.bajins.api.utils.storage
- * @description CosUtil
- * @create 2018-12-16 12:32
  */
 public class CosUtil {
 
@@ -186,7 +183,10 @@ public class CosUtil {
             if (StringUtils.isBlank(key)) {
                 key = file.getName();
             } else {
-                key = key.replace("/", "") + "/" + file.getName();
+                StringBuilder stringBuilder = new StringBuilder(key.replace("/", ""));
+                stringBuilder.append("/");
+                stringBuilder.append(file.getName());
+                key = stringBuilder.toString();
             }
             FileInputStream fileInputStream = new FileInputStream(file);
 

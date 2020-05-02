@@ -9,9 +9,6 @@ import java.util.GregorianCalendar;
  * 简单农历对象
  *
  * @author claer https://www.bajins.com
- * @program com.bajins.api.utils.date
- * @description SimpleLunarCalendar
- * @create 2019-02-15 15:19
  */
 public class LunarCalendar {
 
@@ -315,9 +312,12 @@ public class LunarCalendar {
      * @return 农历日期字符串
      */
     public String getMonthString() {
-        if (lunarMonth == 0)
+        if (lunarMonth == 0) {
             return null;
-        return (this.isLeap() ? "闰" : "") + LunarCalendar.getLunarMonthString(this.lunarMonth);
+        }
+        StringBuilder stringBuilder = new StringBuilder((this.isLeap() ? "闰" : ""));
+        stringBuilder.append(LunarCalendar.getLunarMonthString(this.lunarMonth));
+        return stringBuilder.toString();
     }
 
     /**
@@ -337,9 +337,16 @@ public class LunarCalendar {
      * @return 农历字符串(例 : 甲子年正月初三)
      */
     public String getDateString() {
-        if (lunarYear == 0)
+        if (lunarYear == 0) {
             return null;
-        return this.getYearString() + "年" + this.getMonthString() + "月" + this.getDayString() + "日";
+        }
+        StringBuilder stringBuilder = new StringBuilder(this.getYearString());
+        stringBuilder.append("年");
+        stringBuilder.append(this.getMonthString());
+        stringBuilder.append("月");
+        stringBuilder.append(this.getDayString());
+        stringBuilder.append("日");
+        return stringBuilder.toString();
     }
 
     /**
