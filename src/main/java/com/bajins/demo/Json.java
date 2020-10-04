@@ -1,6 +1,7 @@
 package com.bajins.demo;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -15,6 +16,8 @@ public class Json {
 
     private static void testJackJson() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        // 排除json字符串中实体类没有的字段
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // HashMap<String,String> 转json
         HashMap<String, String> map = new HashMap<String, String>();
