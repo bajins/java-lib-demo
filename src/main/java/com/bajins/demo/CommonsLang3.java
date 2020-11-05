@@ -3,6 +3,9 @@ package com.bajins.demo;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class CommonsLang3 {
 
@@ -163,5 +166,13 @@ public class CommonsLang3 {
         // 判断两个对象不相等，返回一个boolean
         ObjectUtils.notEqual("object1", "object2");
 
+
+    }
+
+    @Override
+    public String toString() {
+        //return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+        // 如果需要排除某些字段， 可以使用ReflectionToStringBuilder.toStringExclude方法
+        return ReflectionToStringBuilder.toString(this);
     }
 }
