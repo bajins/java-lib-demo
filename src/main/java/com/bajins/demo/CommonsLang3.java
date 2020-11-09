@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class CommonsLang3 {
 
@@ -165,6 +166,11 @@ public class CommonsLang3 {
 
         // 判断两个对象不相等，返回一个boolean
         ObjectUtils.notEqual("object1", "object2");
+
+
+        // StringEscapeUtils类可以对html、js、xml、sql等代码进行转义来防止SQL注入及XSS注入
+        System.out.println(StringEscapeUtils.escapeHtml4("<a>abc</a>"));// 转义html脚本
+        System.out.println(StringEscapeUtils.unescapeHtml4("&lt;a&gt;abc&lt;/a&gt;"));// 反转义html脚本
 
 
     }
