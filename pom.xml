@@ -125,6 +125,12 @@
             <version>1.9.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.0-jre</version>
+        </dependency>
+
         <!-- Java 8 之前版本的默认时间替代api依赖 -->
         <dependency>
             <groupId>joda-time</groupId>
