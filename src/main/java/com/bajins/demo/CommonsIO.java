@@ -2,11 +2,19 @@ package com.bajins.demo;
 
 import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * org.apache.commons.commons-io
  */
 public class CommonsIO {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        String tmpdir = System.getProperty("java.io.tmpdir");// 系统默认缓存目录
+        File file = new File(tmpdir + "/test");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
         FileUtils.getFile();
         //FileUtils.getFile();
         //FileUtils.getTempDirectoryPath();
@@ -44,7 +52,7 @@ public class CommonsIO {
         //FileUtils.copyURLToFile();
         //FileUtils.copyURLToFile();
         //FileUtils.copyInputStreamToFile();
-        //FileUtils.deleteDirectory();
+        FileUtils.deleteDirectory(file.getAbsoluteFile());
         //FileUtils.deleteQuietly();
         //FileUtils.directoryContains();
         //FileUtils.cleanDirectory();
