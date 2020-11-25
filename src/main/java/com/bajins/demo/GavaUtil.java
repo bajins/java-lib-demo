@@ -1,6 +1,7 @@
 package com.bajins.demo;
 
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -15,6 +16,9 @@ public class GavaUtil {
         List<Integer> firstPartition = subSets.iterator().next();
         List<Integer> expectedLastPartition = Lists.newArrayList(7, 8);
 
+        // 字符串大写字母转下划线 https://blog.csdn.net/u014082714/article/details/101701372
+        String name = "TestStringName";
+        System.out.println(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name));
 
     }
 }
