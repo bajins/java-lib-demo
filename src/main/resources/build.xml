@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<project name="fax" basedir="." default="build">
+    <property name="src.dir" value="src"/>
+    <property name="web.dir" value="war"/>
+    <property name="build.dir" value="${web.dir}/WEB-INF/classes"/>
+    <property name="name" value="fax"/>
+    <!--<property name="env.JAVA_HOME" value="D:\jdk1.6.0_45"/>
+    <echo message="JAVA_HOME: ${env.JAVA_HOME}" />-->
+    <!--<property file="build.properties" />-->
+    <path id="master-classpath">
+        <fileset dir="${web.dir}/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${build.dir}"/>
+    </path>
+    <!-- depends引用其他target -->
+    <!--<target name="buildAll" depends="preface, clean, compile, resource ,war">
+    </target>-->
+    <target name="build" description="Compile source tree java files">
+        <mkdir dir="${build.dir}"/>
+        <javac destdir="${build.dir}" source="1.5" target="1.5">
+            <src path="${src.dir}"/>
+            <classpath refid="master-classpath"/>
+        </javac>
+    </target>
+    <target name="clean" description="Clean output directories">
+        <delete>
+            <fileset dir="${build.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+        </delete>
+    </target>
+</project>
