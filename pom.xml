@@ -17,6 +17,23 @@
 
     <description>Java第三方依赖使用示例</description>
 
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!--<maven.compiler.source>1.8</maven.compiler.source>-->
+        <!--<maven.compiler.target>1.8</maven.compiler.target>-->
+        <!-- maven方式跳过maven test, 等同 mvn package -Dmaven.test.skip=true
+        跳过了一切与test相关的类， 连.class都不生成， 如果允许junit测试会发现ClassNotFound错误 -->
+        <!--<maven.test.skip>true</maven.test.skip>-->
+        <!-- mvn package 跳过测试阶段，, 等同 mvn package -DskipTests
+        会编译测试类，即生成.class文件，不运行测试类，可以手动运行测试类 -->
+        <skipTests>true</skipTests>
+        <aspectjrt.version>1.8.13</aspectjrt.version>
+        <!-- 编译打包目录 -->
+        <build.dir>${project.build.directory}/build</build.dir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -178,4 +195,181 @@
         </dependency>
 
     </dependencies>
+
+    <!-- 执行 mvn clean package -P prod 命令指定环境打包，
+    build.resources.resource.includes.include 节点指定导入对应环境的资源 -->
+    <profiles>
+        <!-- 开发环境 -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <activation>
+                <!-- 是否为默认使用，如果不指定在eclipse或idea中直接run，会提示spring.profiles.active没有定义 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <!-- 生产环境 -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
+
+    <build>
+        <!-- profile对资源的操作 -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>application*.properties</exclude>
+                </excludes>
+            </resource>
+            <!-- 需要动态添加的资源 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 是否替换@xx@表示的maven properties属性值 -->
+                <!-- 是否过滤资源以用参数化值替换令牌。这些值是从properties元素以及filters元素中列出的文件中的属性获取的。 -->
+                <filtering>true</filtering>
+                <includes>
+                    <include>application.properties</include>
+                    <!-- 导入对应 profiles.profile 节点配置环境 -->
+                    <include>application-${spring.profiles.active}.properties</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <fork>true</fork>
+                    <!-- main启动方法类 -->
+                    <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                    <finalName>${project.name}</finalName>
+                </configuration>
+            </plugin>
+
+            <!-- =============== 打包：依赖jar包放在外部 =============== -->
+
+            <!-- 项目依赖插件  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <!--<outputDirectory>${project.build.directory}/libs</outputDirectory>-->
+                    <!-- 表示是否不包含间接依赖的包 -->
+                    <excludeTransitive>false</excludeTransitive>
+                    <!-- 文件名不去除版本信息 -->
+                    <stripVersion>false</stripVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 拷贝项目依赖包到指定目录下 -->
+                            <outputDirectory>${build.dir}/libs</outputDirectory>
+                            <excludeTransitive>false</excludeTransitive>
+                            <stripVersion>false</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 设置jar的入口类 -->
+            <!-- 打包插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <!-- 生成MANIFEST.MF的设置 -->
+                        <manifest>
+                            <!-- 为依赖包添加路径, 这些路径会写在MANIFEST文件的Class-Path下 -->
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                            <!-- jar启动入口类，这个需要修改-->
+                            <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>${build.dir}</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- 打包：依赖jar包和资源打包到一个jar包中,不能与spring-boot-maven-plugin同时使用 -->
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    &lt;!&ndash;<outputDirectory>${project.build.directory}/install</outputDirectory>&ndash;&gt;
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${project.name}-shade</finalName>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+                            &lt;!&ndash; http://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html &ndash;&gt;
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+                                    <resource>META-INF/spring.factories</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.tooling</resource>
+                                </transformer>
+                                &lt;!&ndash;<transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>&ndash;&gt;
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                                </transformer>
+                            </transformers>
+                            &lt;!&ndash; 打包后找不到main方法，加入以下过滤器 &ndash;&gt;
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
+    </build>
 </project>
