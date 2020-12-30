@@ -121,7 +121,7 @@ public class AntExamples {
         IBuildConfiguration buildConfig = javaBuilder.getBuildConfig();*/
         //CompilationProgress
         Main main = new Main(new PrintWriter(System.out), new PrintWriter(System.err), true, null, null);
-        main.compile(new String[]{"", ""});
+        boolean compile = main.compile(new String[]{"", ""});
 
 
         /**
