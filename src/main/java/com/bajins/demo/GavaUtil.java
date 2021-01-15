@@ -20,5 +20,13 @@ public class GavaUtil {
         String name = "TestStringName";
         System.out.println(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name));
 
+        // List转Map
+        /*Map<Long, User> maps = Maps.uniqueIndex(userList, new Function<User, Long>() {
+            @Override
+            public Long apply(User user) {
+                return user.getId();
+            }
+        });*/
+
     }
 }
