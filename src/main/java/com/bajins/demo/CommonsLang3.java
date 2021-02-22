@@ -246,7 +246,7 @@ public class CommonsLang3 {
      * @param lhs    第一个对象
      * @param rhs    第二个对象
      * @param fields 需要比较的属性字段
-     * @return
+     * @return 相同返回true，不同则返回false
      * @throws IntrospectionException
      * @throws InvocationTargetException
      * @throws IllegalAccessException
