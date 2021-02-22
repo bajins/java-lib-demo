@@ -1,6 +1,7 @@
 package com.bajins.demo;
 
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
@@ -12,6 +13,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+
+/**
+ * PropertyUtils类和BeanUtils不同在于：运行getProperty、setProperty操作时，没有类型转换，使用属性的原有类型或者包装类
+ *
+ * @see PropertyUtils
+ * @see BeanUtils
+ */
 public class BeanUtilsLearning {
 
     /**
@@ -21,6 +29,7 @@ public class BeanUtilsLearning {
      * @return
      */
     public static String[] getPropertyNamesNotNull(Object source) {
+        // BeanInfo wrappedSource = Introspector.getBeanInfo(source.getClass());
         final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
         PropertyDescriptor[] pds = wrappedSource.getPropertyDescriptors();
         Set<String> emptyNames = new HashSet<>();
@@ -35,6 +44,7 @@ public class BeanUtilsLearning {
     }
 
     public static String[] getPropertyNamesNotNullByStream(Object source) {
+        // BeanInfo wrappedSource = Introspector.getBeanInfo(source.getClass());
         final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
         // Java8 Stream获取非空属性
         String[] result = Stream.of(wrappedSource.getPropertyDescriptors())
@@ -47,7 +57,7 @@ public class BeanUtilsLearning {
     public static void main(String[] args) {
         try {
             // map转bean
-            org.apache.commons.beanutils.BeanUtils.populate("obj", new HashMap<>());
+            BeanUtils.populate("obj", new HashMap<>());
 
             /**
              * 对象拷贝

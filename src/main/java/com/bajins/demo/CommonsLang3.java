@@ -9,6 +9,16 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class CommonsLang3 {
 
     /**
@@ -228,6 +238,45 @@ public class CommonsLang3 {
         System.out.println(StringEscapeUtils.unescapeHtml4("&lt;a&gt;abc&lt;/a&gt;"));// 反转义html脚本
 
 
+    }
+
+    /**
+     * 比较两个对象指定的属性值是否相等
+     *
+     * @param lhs    第一个对象
+     * @param rhs    第二个对象
+     * @param fields 需要比较的属性字段
+     * @return
+     * @throws IntrospectionException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    public boolean equalsFields(Object lhs, Object rhs, String... fields) throws IntrospectionException,
+            InvocationTargetException, IllegalAccessException {
+        Class<?> lhsClazz = lhs.getClass();
+        Class<?> rhsClazz = rhs.getClass();
+        if (lhsClazz != rhsClazz) {
+            return false;
+        }
+        // 数组转Map
+        Map<String, String> fieldMap = Arrays.stream(fields).collect(Collectors.toMap(e -> e, Function.identity()));
+        EqualsBuilder equalsBuilder = new EqualsBuilder();
+        // 获取JavaBean的所有属性
+        PropertyDescriptor[] pds = Introspector.getBeanInfo(lhsClazz, Object.class).getPropertyDescriptors();
+        for (PropertyDescriptor pd : pds) {
+            // 遍历获取属性名
+            String name = pd.getName();
+            if (name.equals(fieldMap.get(name))) {
+                // 获取属性的get方法
+                Method readMethod = pd.getReadMethod();
+                // 调用get方法获得属性值
+                Object lhsValue = readMethod.invoke(lhs);
+                Object rhsValue = readMethod.invoke(rhs);
+                // 添加到比较
+                equalsBuilder.append(lhsValue, rhsValue);
+            }
+        }
+        return equalsBuilder.isEquals();
     }
 
     @Override

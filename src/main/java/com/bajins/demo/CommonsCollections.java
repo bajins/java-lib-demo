@@ -2,12 +2,18 @@ package com.bajins.demo;
 
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.comparators.ComparableComparator;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.Comparator;
 import java.util.List;
 
+
+/**
+ * @see MapUtils
+ * @see ListUtils
+ */
 public class CommonsCollections {
     public static void main(String[] args) {
         // 使用Apache Collections对List集合中的泛型中的bean某一个字段排序
