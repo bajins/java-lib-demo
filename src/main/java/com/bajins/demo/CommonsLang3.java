@@ -251,7 +251,7 @@ public class CommonsLang3 {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public boolean equalsFields(Object lhs, Object rhs, String... fields) throws IntrospectionException,
+    public static boolean equalsFields(Object lhs, Object rhs, String... fields) throws IntrospectionException,
             InvocationTargetException, IllegalAccessException {
         Class<?> lhsClazz = lhs.getClass();
         Class<?> rhsClazz = rhs.getClass();
