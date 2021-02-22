@@ -4,6 +4,8 @@ import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -226,6 +228,23 @@ public class CommonsLang3 {
         System.out.println(StringEscapeUtils.unescapeHtml4("&lt;a&gt;abc&lt;/a&gt;"));// 反转义html脚本
 
 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        /*CommonsLang3 rhs = (CommonsLang3) obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(field1, rhs.field1)
+                .append(field2, rhs.field2)
+                .append(field3, rhs.field3)
+                .isEquals();*/
+        return EqualsBuilder.reflectionEquals(this, obj, "id,age,userName");
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     @Override
