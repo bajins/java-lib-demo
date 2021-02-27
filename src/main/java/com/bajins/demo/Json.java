@@ -30,8 +30,10 @@ public class Json {
         HashMap<String, String> mmap = objectMapper.readValue(mjson, HashMap.class);
         System.out.println(mmap);
 
-        // 转换为 Map<String, Object>
+        // json转 Map<String, Object>
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(HashMap.class, String.class,
+                Object.class);
+        JavaType javaType1 = objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class,
                 Object.class);
         Map<String, Object> map1 = objectMapper.readValue(mjson, javaType);
         System.out.println(map1);
@@ -55,6 +57,8 @@ public class Json {
         // 转换为 ArrayList<Map<String,Object>>
         CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class,
                 HashMap.class);
+        CollectionType collectionType1 = objectMapper.getTypeFactory().constructCollectionType(List.class,
+                javaType);
         ArrayList<HashMap<String, Object>> list1 = objectMapper.readValue(ljson, collectionType);
         System.out.println(list1);
 
