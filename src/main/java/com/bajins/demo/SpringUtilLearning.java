@@ -1,6 +1,10 @@
 package com.bajins.demo;
 
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * @see org.springframework.util
@@ -44,9 +48,12 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.web.bind.ServletRequestUtils
  */
 public class SpringUtilLearning {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String text = " \t ";
         System.out.println(StringUtils.isEmpty(text));
         System.out.println(StringUtils.hasText(text));
+
+        Properties properties = PropertiesLoaderUtils.loadAllProperties("com/test/config/config.properties");
+        System.out.println(properties.getProperty("key"));
     }
 }
