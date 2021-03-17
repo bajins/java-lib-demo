@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 /*@SpringBootTest
-@RunWith(SpringRunner::class)
+@RunWith(SpringRunner.class)
 //@RunWith(SpringJUnit4ClassRunner.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(locations = {"classpath:spring-*.xml", "file:WebContent/META-INF/datasource-test.xml"})*/
@@ -19,34 +19,6 @@ public class DemoTest {
     /*private static String[] springFiles = { "beans/my-beans-config.xml" };
     private ClassPathXmlApplicationContext context;*/
 
-    @Before
-    public void init() {
-        System.out.println("ehcache缓存目录:" + System.getProperty("java.io.tmpdir"));
-        try {
-            ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext("classpath:spring/springtest/InitJndi.xml");
-            DataSource ds = (DataSource) app.getBean("dataSource");
-            /*SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-            builder.bind("java:comp/env/jdbc/db1", ds);
-            builder.activate();
-
-            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
-
-            //这里提取测试bean
-            testCacheService = (TestCacheService) appcontext.getBean("testCacheService");
-            sqlService = (SqlService) appcontext.getBean("sqlService");
-
-            baseDao = (BaseDao) appcontext.getBean("baseDao");
-            hibernateTemplate = (HibernateTemplate) appcontext.getBean("hibernateTemplate");*/
-
-            /*SimpleNamingContextBuilder.emptyActivatedContextBuilder();
-            this.initContext = new InitialContext();
-            this.initContext.bind("java:comp/env/jdbc/datasource", new DriverManagerDataSource("jdbc:h2:mem:testdb"));
-            DataSource ds = (DataSource) this.initContext.lookup("java:comp/env/jdbc/datasource");*/
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @BeforeClass
     public static void initClass() throws NamingException {
@@ -70,7 +42,6 @@ public class DemoTest {
         map.put(DruidDataSourceFactory.PROP_PASSWORD, password);
         DataSource ds = DruidDataSourceFactory.createDataSource(map);*/
 
-
         // org.springframework.jndi.JndiObjectFactoryBean获取JNDI数据源配置信息
         // InitialContext 在应用服务器（如Tomcat）的上下文里才存在。
         // 不能用main函数直接测试，只能放到tomcat或者servlet、jsp显示
@@ -86,6 +57,38 @@ public class DemoTest {
         /*SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
         //builder.bind("java:comp/env/myDataSourceJNDI", dataSource);
         builder.activate();*/
+    }
+
+    /**
+     * 比@BeforeClass后执行
+     */
+    @Before
+    public void init() {
+        System.out.println("ehcache缓存目录:" + System.getProperty("java.io.tmpdir"));
+        try {
+            ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext("classpath:spring/springtest" +
+                    "/InitJndi.xml");
+            DataSource ds = (DataSource) app.getBean("dataSource");
+            /*SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
+            builder.bind("java:comp/env/jdbc/db1", ds);
+            builder.activate();
+
+            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
+
+            //这里提取测试bean
+            testCacheService = (TestCacheService) appcontext.getBean("testCacheService");
+            sqlService = (SqlService) appcontext.getBean("sqlService");
+
+            baseDao = (BaseDao) appcontext.getBean("baseDao");
+            hibernateTemplate = (HibernateTemplate) appcontext.getBean("hibernateTemplate");*/
+
+            /*SimpleNamingContextBuilder.emptyActivatedContextBuilder();
+            this.initContext = new InitialContext();
+            this.initContext.bind("java:comp/env/jdbc/datasource", new DriverManagerDataSource("jdbc:h2:mem:testdb"));
+            DataSource ds = (DataSource) this.initContext.lookup("java:comp/env/jdbc/datasource");*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
