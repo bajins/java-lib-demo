@@ -12,6 +12,9 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 异步线程池配置
+ */
 @Configuration
 @EnableAsync
 public class AsyncExecutorConfig {

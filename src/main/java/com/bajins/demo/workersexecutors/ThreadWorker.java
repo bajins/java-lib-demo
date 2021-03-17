@@ -5,9 +5,16 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+/**
+ * 执行线程
+ */
 @Service
 public class ThreadWorker {
-    private ThreadPoolTaskExecutor poolTaskExecutor;// 如在springMVC配置文件中配置该线程池信息,名字要与配置文件中bean的id一样
+    /**
+     * 如在springMVC配置文件中配置该线程池信息,名字要与配置文件中bean的id一样
+     * 如在springBoot中配置该线程池信息,名字要与@Bean中名称一样
+     */
+    private ThreadPoolTaskExecutor poolTaskExecutor;
     private TaskExecutor taskExecutor;
 
     @Autowired
