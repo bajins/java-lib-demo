@@ -2,16 +2,26 @@ package com.bajins.demo;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-/*@SpringBootTest
+@SpringBootTest
 @RunWith(SpringRunner.class)
 //@RunWith(SpringJUnit4ClassRunner.class)
-@AutoConfigureMockMvc
-@ContextConfiguration(locations = {"classpath:spring-*.xml", "file:WebContent/META-INF/datasource-test.xml"})*/
+//@AutoConfigureMockMvc
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+        "classpath:application.properties",
+        "classpath:application-dev.properties",
+        /*"file:WebContent/META-INF/datasource-test.xml"*/
+})
 public class DemoTest {
 
     /*@Resource
@@ -73,7 +83,8 @@ public class DemoTest {
             builder.bind("java:comp/env/jdbc/db1", ds);
             builder.activate();
 
-            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext("classpath:spring/spring.xml");
+            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext("classpath:spring/spring
+            .xml");
 
             //这里提取测试bean
             testCacheService = (TestCacheService) appcontext.getBean("testCacheService");

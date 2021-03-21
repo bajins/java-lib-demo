@@ -1,5 +1,6 @@
 package com.bajins.demo;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
 
@@ -55,5 +56,7 @@ public class SpringUtilLearning {
 
         Properties properties = PropertiesLoaderUtils.loadAllProperties("com/test/config/config.properties");
         System.out.println(properties.getProperty("key"));
+
+        ClassPathResource classPathResource = new ClassPathResource("com/test/config/config.properties");
     }
 }
