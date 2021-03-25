@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class GavaUtil {
+public class GuavaLearning {
     public static void main(String[] args) {
         List<Integer> intList = Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8);
         // 将一个list按三个一组分成N个小的list，

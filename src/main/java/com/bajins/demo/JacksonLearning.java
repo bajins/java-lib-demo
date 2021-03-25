@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Json {
+public class JacksonLearning {
 
     private static void testJackJson() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
