@@ -2,6 +2,7 @@ package com.bajins.demo;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.util.Properties;
 
 /**
  * @see org.springframework.util
+ * @see StringUtils 字符串工具类
+ * @see Assert 断言工具类
  * <br/>
  * @see org.springframework.core
  * @see BridgeMethodResolver 桥接方法分析器
@@ -58,5 +61,8 @@ public class SpringUtilLearning {
         System.out.println(properties.getProperty("key"));
 
         ClassPathResource classPathResource = new ClassPathResource("com/test/config/config.properties");
+
+        Assert.notNull(text, "内容为空");
+        Assert.hasText(text, "内容为空");
     }
 }
