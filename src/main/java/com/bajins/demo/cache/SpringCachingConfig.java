@@ -44,6 +44,21 @@ public class SpringCachingConfig implements CachingConfigurer {
         return new EhCacheCacheManager(ehCacheManagerFactoryBean().getObject());
     }*/
 
+    /*@Autowired
+    private CacheManager cacheManager;
+
+    @Bean("simpleCacheResolver")
+    public CacheResolver simpleCacheResolver(){
+        SimpleCacheResolver resolver = new SimpleCacheResolver(cacheManager);
+        return resolver;
+    }
+
+    @Bean("namedCacheResolver")
+    public CacheResolver namedCacheResolver(){
+        NamedCacheResolver resolver = new NamedCacheResolver(cacheManager, "outLimit");
+        return resolver;
+    }*/
+
     @Bean(destroyMethod = "shutdown")
     public net.sf.ehcache.CacheManager ehCacheManager() {
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
