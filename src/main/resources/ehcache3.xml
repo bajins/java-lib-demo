@@ -1,0 +1,48 @@
+<config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
+    <!-- 1、声明一个名为foo的Cache-->
+    <cache alias="foo">
+        <!--2、foo的键值对被声明为字符串类型，如果没有指明，默认是Object类型。-->
+        <key-type>java.lang.String</key-type>
+        <value-type>java.lang.String</value-type>
+        <resources>
+            <!--3、foo被声明在堆上保存多达2,000个条目。-->
+            <heap unit="entries">2000</heap>
+            <!--4、在它开始被驱逐之前，还有多达500 MB的外堆内存-->
+            <offheap unit="MB">500</offheap>
+        </resources>
+    </cache>
+
+    <!-- <cache-template>可以让你创建一个抽象的<cache>配置文件，该配置文件可以进一步的被扩展。-->
+    <cache-template name="myDefaults">
+        <key-type>java.lang.Long</key-type>
+        <value-type>java.lang.String</value-type>
+        <!--  org.ehcache.config.ResourceUnit中的属性，声明在堆上保存多达2,000个条目 -->
+        <heap unit="entries">200</heap>
+    </cache-template>
+    <!-- bar是这样的cache，它使用名为myDefaults的<cache-template>，并将其主键覆盖到更广泛的类型-->
+    <cache alias="bar" uses-template="myDefaults">
+        <key-type>java.lang.Number</key-type>
+        <expiry>
+            <!-- 通过ttl指定了cache过期时间,java.util.concurrent.TimeUnit中的属性，这里指定为10秒 -->
+            <ttl unit="seconds">10</ttl>
+        </expiry>
+    </cache>
+    <!-- simpleCache是另一个cache，它使用myDefaults配置文件作为其唯一的CacheConfiguration-->
+    <cache alias="simpleCache" uses-template="myDefaults"/>
+
+
+    <cache-template name="stringTemplate">
+        <key-type>java.lang.String</key-type>
+        <value-type>java.lang.Object</value-type>
+        <heap unit="MB">200</heap>
+    </cache-template>
+    <cache alias="stringCache" uses-template="stringTemplate">
+        <value-type>java.lang.String</value-type>
+        <expiry>
+            <!-- 通过ttl指定了cache过期时间,java.util.concurrent.TimeUnit中的属性，这里指定为10分钟 -->
+            <ttl unit="minutes">10</ttl>
+        </expiry>
+    </cache>
+</config>

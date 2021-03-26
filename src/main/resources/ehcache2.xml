@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="true" monitoring="autodetect" dynamicConfig="true">
+    <diskStore path="java.io.tmpdir"/>
+    <!-- 当Java代码里没有获取到指定的缓存名时，将使用此默认缓存配置 -->
+    <defaultCache maxElementsInMemory="5000" eternal="false"
+                  overflowToDisk="true" timeToIdleSeconds="1800" timeToLiveSeconds="1800"
+                  diskPersistent="false" diskExpiryThreadIntervalSeconds="120"/>
+    <!--
+    external：如果设置为true缓存就会一直存在，同时timeToIdleSecond和stimeToLiveSeconds无效
+    maxEntriesLocalHeap:堆内存中最大缓存对象数,0没有限制
+    maxElementsInMemory：内存中可以缓存多少个缓存条目
+    overflowToDisk：如果内存不够的时候，是否溢出到磁盘
+    diskPersistent：是否启用磁盘持久化的机制，在jvm崩溃的时候和重启之间
+    timeToIdleSeconds：对象最大的闲置的时间，如果超出闲置的时间，可能就会过期,单位：秒 当eternal=false对象不是永久有效时使用，
+                        可选属性，默认值是0，也就是可闲置时间无穷大
+    timeToLiveSeconds：对象最多存活的时间,单位：秒 当eternal=false对象不是永久有效时使用，可选属性，默认值是0，也就是存活时间无穷大
+    memoryStoreEvictionPolicy：当缓存数量达到了最大的指定条目数的时候，需要采用一定的算法，从缓存中清除一批数据，LRU，最近最少使用算法，
+                            最近一段时间内，清除最少使用的那些数据
+    statistics：统计信息 -->
+
+    <!--
+    timeToLiveSeconds=200：缓存自创建日期起至失效时的间隔时间200；
+    timeToIdleSeconds=200：缓存创建以后，最后一次访问缓存的日期至失效之时的时间间隔200；
+    如果仅有 timeToLiveSeconds 那么 自创建时间开始 间隔x后缓存失效；
+    如果没有 timeToLiveSeconds 那么自最后一次访问缓存 间隔y后 缓存失效；
+    如果既有timeToLiveSeconds 也有 timeToIdleSeconds 那么取最小数算作间隔时间；min(x,y);；
+    计算原则是：若自创建缓存后一直都没有访问缓存，那么间隔x后失效，
+    若自创建缓存后有N次访问缓存，那么计算（最后一次访问缓存时间+y ）
+    即：按照timeToIdleSeconds计算，但总存活时间不超过 y;举个例子：
+    timeToIdleSeconds=120；
+    timeToLiveSeconds=180；
+    上面的表示此缓存最多可以存活3分钟，如果期间超过2分钟未访问 那么此缓存失效！
+    如果要使缓存中单个Element定时过期，可在new时传入过期时间
+    -->
+    <cache name="entityCache" maxElementsInMemory="5000" eternal="true"
+           timeToIdleSeconds="0" timeToLiveSeconds="0" overflowToDisk="false"/>
+
+    <!-- simpleCache缓存 -->
+    <cache name="simpleCache" maxElementsInMemory="1000" eternal="false"
+           timeToIdleSeconds="5" timeToLiveSeconds="5" overflowToDisk="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+</ehcache>
