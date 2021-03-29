@@ -3,15 +3,18 @@ package com.bajins.demo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
  * @see org.springframework.util
  * @see StringUtils 字符串工具类
  * @see Assert 断言工具类
+ * @see ReflectionUtils 反射工具类
  * <br/>
  * @see org.springframework.core
  * @see BridgeMethodResolver 桥接方法分析器
@@ -64,5 +67,15 @@ public class SpringUtilLearning {
 
         Assert.notNull(text, "内容为空");
         Assert.hasText(text, "内容为空");
+
+
+        // 使用org.springframework.wechatutil.StringUtils.countOccurrencesOf查找并统计子串出现在字符串中的次数
+        int i = StringUtils.countOccurrencesOf("srcStr", "findStr");
+
+        // 利用Spring Framework的StringUtils将逗号分隔的字符串转换为数组
+        String[] strings = StringUtils.commaDelimitedListToStringArray("s,t,r");
+        // 利用Spring Framework的StringUtils把list转String
+        String s = StringUtils.collectionToDelimitedString(Arrays.asList(strings), ",");
+
     }
 }

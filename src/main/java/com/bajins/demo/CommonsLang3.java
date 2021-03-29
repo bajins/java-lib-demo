@@ -249,19 +249,12 @@ public class CommonsLang3 {
         // 使用org.apache.commons.lang3.StringUtils.countMatches查找并统计子串出现在字符串中的次数
         int i1 = StringUtils.countMatches("abba", "a");
 
-        // 使用org.springframework.wechatutil.StringUtils.countOccurrencesOf查找并统计子串出现在字符串中的次数
-        int i = org.springframework.util.StringUtils.countOccurrencesOf("srcStr", "findStr");
-
-
-        // 利用Spring Framework的StringUtils将逗号分隔的字符串转换为数组
-        String[] strings = org.springframework.util.StringUtils.commaDelimitedListToStringArray("s,t,r");
-        // 利用Spring Framework的StringUtils把list转String
-        String s = org.springframework.util.StringUtils.collectionToDelimitedString(Arrays.asList(strings), ",");
-
     }
 
     /**
      * 比较两个对象指定的属性值是否相等
+     * <p>
+     * 忽略指定字段并比较两个对象：EqualsBuilder.reflectionEquals(lhs, rhs, "id","code")
      *
      * @param lhs    第一个对象
      * @param rhs    第二个对象
