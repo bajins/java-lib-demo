@@ -1,20 +1,34 @@
 package com.bajins.demo;
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.FeatureDescriptor;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * @see org.springframework.util
  * @see StringUtils 字符串工具类
  * @see Assert 断言工具类
  * @see ReflectionUtils 反射工具类
+ * <br/>
+ * @see org.springframework.beans JavaBean相关操作
+ * @see BeanUtils
+ * @see PropertyAccessorUtils
+ * @see PropertyDescriptorUtils
+ * @see BeanWrapperImpl
  * <br/>
  * @see org.springframework.core
  * @see BridgeMethodResolver 桥接方法分析器
@@ -55,6 +69,39 @@ import java.util.Properties;
  * @see org.springframework.web.bind.ServletRequestUtils
  */
 public class SpringUtilLearning {
+
+    /**
+     * 获取所有非空的属性
+     *
+     * @param source
+     * @return
+     */
+    public static String[] getPropertyNamesNotNull(Object source) {
+        // BeanInfo wrappedSource = Introspector.getBeanInfo(source.getClass());
+        final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = wrappedSource.getPropertyDescriptors();
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = wrappedSource.getPropertyValue(pd.getName());
+            if (null != srcValue) {
+                emptyNames.add(pd.getName());
+            }
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
+    public static String[] getPropertyNamesNotNullByStream(Object source) {
+        // BeanInfo wrappedSource = Introspector.getBeanInfo(source.getClass());
+        final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
+        // Java8 Stream获取非空属性
+        String[] result = Stream.of(wrappedSource.getPropertyDescriptors())
+                .map(FeatureDescriptor::getName)
+                .filter(propertyName -> wrappedSource.getPropertyValue(propertyName) != null)
+                .toArray(String[]::new);
+        return result;
+    }
+
     public static void main(String[] args) throws IOException {
         String text = " \t ";
         System.out.println(StringUtils.isEmpty(text));
@@ -77,5 +124,8 @@ public class SpringUtilLearning {
         // 利用Spring Framework的StringUtils把list转String
         String s = StringUtils.collectionToDelimitedString(Arrays.asList(strings), ",");
 
+        //org.springframework.beans.BeanUtils.copyProperties();
+        //org.springframework.cglib.beans.BeanCopier.create().copy();
+        //BeanUtils.copyProperties(Object source, Object target, String... ignoreProperties);
     }
 }
