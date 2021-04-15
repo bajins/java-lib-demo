@@ -64,50 +64,44 @@ public class HttpUtil {
     /**
      * 获取用户真实IP地址
      * <p>
-     * 不使用request.getRemoteAddr();的原因是有可能用户使用了代理软件方式避免真实IP地址,
-     * 可是，如果通过了多级反向代理的话，X-Forwarded-For的值并不止一个，而是一串IP值，究竟哪个才是真正的用户端的真实IP呢？
-     * 答案是取X-Forwarded-For中第一个非unknown的有效IP字符串。
-     * <p>
-     * 如：X-Forwarded-For：192.168.1.110, 192.168.1.120, 192.168.1.130,
-     * 192.168.1.100
-     * <p>
-     * 用户真实IP为： 192.168.1.110
+     * 当我们通过request获取客户端IP时，如果对自身服务器做了反向代理。
+     * 通过request.getRemoteAddr();可能获取到的是代理服务器的IP，而无法获取到用户请求IP
      *
      * @param request
      * @return java.lang.String
      */
     public static String getIpAddress(HttpServletRequest request) {
-        String Xip = request.getHeader("X-Real-IP");
-        String XFor = request.getHeader("X-Forwarded-For");
-        if (StringUtils.isNotBlank(XFor) && !"unKnown".equalsIgnoreCase(XFor)) {
-            // 多次反向代理后会有多个ip值，第一个ip才是真实ip
-            int index = XFor.indexOf(",");
-            if (index != -1) {
-                return XFor.substring(0, index);
-            } else {
-                return XFor;
-            }
+        // X-Real-IP：Nginx服务代理
+        String ipAddresses = request.getHeader("X-Real-IP");
+
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            // Proxy-Client-IP：Apache 服务代理
+            ipAddresses = request.getHeader("Proxy-Client-IP");
         }
-        XFor = Xip;
-        if (StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)) {
-            return XFor;
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            // WL-Proxy-Client-IP：WebLogic 服务代理
+            ipAddresses = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
-            XFor = request.getHeader("Proxy-Client-IP");
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            // HTTP_CLIENT_IP：有些代理服务器
+            ipAddresses = request.getHeader("HTTP_CLIENT_IP");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
-            XFor = request.getHeader("WL-Proxy-Client-IP");
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            ipAddresses = request.getHeader("HTTP_X_FORWARDED_FOR");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
-            XFor = request.getHeader("HTTP_CLIENT_IP");
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            // X-Forwarded-For：Squid 服务代理 和 Nginx服务代理
+            ipAddresses = request.getHeader("X-Forwarded-For");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
-            XFor = request.getHeader("HTTP_X_FORWARDED_FOR");
+        // 有些网络通过多层代理，那么会获取到以逗号（,）分割的多个IP，第一个才是真实IP
+        int index = ipAddresses.indexOf(",");
+        if (index != -1) {
+            ipAddresses = ipAddresses.substring(0, index);
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
-            XFor = request.getRemoteAddr();
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            ipAddresses = request.getRemoteAddr();
         }
-        return XFor.equals("0:0:0:0:0:0:0:1") ? "127.0.0.1" : XFor;
+        return ipAddresses;
     }
 
     /**
