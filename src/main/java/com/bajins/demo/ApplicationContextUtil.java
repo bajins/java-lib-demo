@@ -39,7 +39,8 @@ public class ApplicationContextUtil implements ApplicationContextAware {
      * @throws BeansException bean异常
      */
     public static <T> @NotNull T getBean(String beanName, Class<T> t) throws BeansException {
-        /*ServletContext servletContext = ContextLoader.getCurrentWebApplicationContext().getServletContext();
+        /*//ServletContext servletContext = httpServletRequest.getSession().getServletContext();
+        ServletContext servletContext = ContextLoader.getCurrentWebApplicationContext().getServletContext();
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         T sv = context.getBean("testService");
 
