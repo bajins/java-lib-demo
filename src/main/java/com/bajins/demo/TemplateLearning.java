@@ -83,10 +83,28 @@ public class TemplateLearning {
             stl.putTemplate("content", template);
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_20);
             cfg.setTemplateLoader(stl);
+            /*<bean id="freemarkerConfig"
+                class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+              <property name="freemarkerSettings">
+                <props>
+                  <prop key="classic_compatible">true</prop>
+                </props>
+              </property>
+            </bean>*/
+            //spring.freemarker.settings.classic_compatible=true
+            // 在ftl前加入<!--#setting classic_compatible=true-->;
+            // <#escape x as x!"">null替换为空字符串</#escape> <#noescape>不处理null</#noescape>
+            /* ${user?if_exists} ${user!''} ${user!} ${user?default('')} ${user???string(user,'')} */
+            cfg.setClassicCompatible(true);// 为null则替换为空字符串
             Template tpl = cfg.getTemplate("content");
             StringWriter writer = new StringWriter();
             tpl.process(params, writer);
             return writer.toString();
+            /*Environment env = tpl.createProcessingEnvironment(params, writer);
+            env.setClassicCompatible(true);// 为null则替换为空字符串
+            env.setCustomAttribute("paramMap", params);// 自定义属性
+            env.process();
+            return writer.toString();*/
         } catch (Exception e) {
             return null;
         }
