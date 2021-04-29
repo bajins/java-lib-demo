@@ -13,6 +13,19 @@ import java.util.*;
 
 /**
  * Quartz定时任务管理类
+ * <pre>
+ * 核心接口有 https://blog.csdn.net/QXC1281/article/details/68924140
+ * Scheduler – (调度器)与scheduler交互的主要API；
+ * Job – (作业)你通过scheduler执行任务，你的任务类需要实现的接口；
+ * JobDetail – (作业实例)定义Job的实例；
+ * Trigger – (触发器)触发Job的执行；
+ *      SimpleTrigger :简单触发器
+ *      CalendarIntervalTrigger:日历触发器
+ *      CronTrigger:Cron表达式触发器
+ *      DailyTimeIntervalTrigger:日期触发器
+ * JobBuilder – 定义和创建JobDetail实例的接口;
+ * TriggerBuilder – 定义和创建Trigger实例的接口；
+ * </pre>
  *
  * @author claer https://www.bajins.com
  * @create 2018-12-19 00:46
@@ -383,6 +396,51 @@ public class QuartzManager {
             list.add(map);
         }
         return list;
+    }
+
+    public void addJobTest(String id, String jobGroup, Class clazz, Map<String, Object> data, Date startAt,
+                           Date endAt) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(clazz) // 创建builder，(jobDetail的预准备对象)
+                // 通过builder调用withIdentity()去设置builder的名字和分组,最后通过build()方法获得一个jobDetail对象
+                .withIdentity(id, jobGroup).build();
+        jobDetail.getJobDataMap().putAll(data);
+
+        // 定义一个触发器trigger对象，用来执行jobDetail
+        SimpleTrigger trigger = TriggerBuilder.newTrigger() //创建一个触发器trigger对象
+                // 设置触发器的名字和分组
+                .withIdentity(id, jobGroup)
+                // 设置以哪种方式执行JobDetail：
+                // 一、SimpleScheduleBuilder 简单任务的重复执行SimpleScheduleBuilder.repeatSecondlyForever(5)
+                // 二、CronTrigger 按日历触发任务CronScheduleBuilder.cronSchedule("0 17 1 * * ?")
+                // CalendarIntervalScheduleBuilder.calendarIntervalSchedule().withInterval(2, DateBuilder.IntervalUnit.SECOND)
+                // 以及执行一次JobDetail的间隔时间,以及执行到什么时候
+                .forJob(jobDetail)
+                // 每隔5分钟执行一次,永远重复不限制次数执行,失效之后，再启动马上执行
+                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(1))
+                //设置触发器开始执行JobDetail的起始时间，还有startNow()立即执行
+                .startAt(startAt)
+                // 结束时间 endAt（“结束的时间”），实现在任务执后自动销毁任务
+                .endAt(endAt)
+                // 最终获得一个Trigger对象
+                .build();
+        try {
+            // 调度容器设置JobDetail和Trigger
+            scheduler.scheduleJob(jobDetail, trigger);
+
+            // 启动
+            if (!scheduler.isShutdown()) {
+                scheduler.start();
+            }
+            // 获取触发器状态
+            Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+            // 判断触发器状态是否为暂停
+            if (Trigger.TriggerState.PAUSED.equals(triggerState)) {
+                // 如果触发器为暂停就恢复启动
+                scheduler.resumeTrigger(trigger.getKey());
+            }
+        } catch (SchedulerException e) {
+            throw e;
+        }
     }
 
 
