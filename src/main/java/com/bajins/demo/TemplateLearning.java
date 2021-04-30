@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,6 +97,10 @@ public class TemplateLearning {
             // <#escape x as x!"">null替换为空字符串</#escape> <#noescape>不处理null</#noescape>
             /* ${user?if_exists} ${user!''} ${user!} ${user?default('')} ${user???string(user,'')} */
             cfg.setClassicCompatible(true);// 为null则替换为空字符串
+            cfg.setTimeZone(TimeZone.getTimeZone("GMT> 08:00"));// 获取东八区时间
+            cfg.setTimeFormat("HH:mm:ss.SSS");// 时间格式化
+            cfg.setDateFormat("yyyy-MM-dd");// 日期格式化
+            cfg.setDateTimeFormat("yyyy-MM-dd HH:mm:ss.SSS");// 日期时间格式化
             Template tpl = cfg.getTemplate("content");
             StringWriter writer = new StringWriter();
             tpl.process(params, writer);
