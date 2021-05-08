@@ -14,8 +14,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -345,6 +347,61 @@ public class HttpUtil {
             String key = headerNames.nextElement();
             String value = request.getHeader(key);
             returnMap.put(key, value);
+        }
+        return returnMap;
+    }
+
+    /**
+     * 获取HttpServletRequest中的Attribute并封装到Map<String, Object>
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, Object> getAttributeMap(HttpServletRequest request) {
+        Objects.requireNonNull(request);
+        Map<String, Object> returnMap = new HashMap<>();
+        Enumeration<String> attributeNames = request.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String key = attributeNames.nextElement();
+            Object attribute = request.getAttribute(key);
+            returnMap.put(key, attribute);
+        }
+        return returnMap;
+    }
+
+    /**
+     * 获取HttpServletRequest中的参数并封装到Map<String, Object>
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, String> getParameterToMap(HttpServletRequest request) {
+        Objects.requireNonNull(request);
+        Map<String, String> returnMap = new HashMap<>();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String key = parameterNames.nextElement();
+            String value = request.getParameter(key);
+            returnMap.put(key, value);
+        }
+        return returnMap;
+    }
+
+    /**
+     * 获取HttpServletRequest中的参数（包含文件）并封装到Map<String, Object>
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, Part> getPartsMap(HttpServletRequest request) throws ServletException, IOException {
+        Objects.requireNonNull(request);
+        Map<String, Part> returnMap = new HashMap<>();
+        Collection<Part> parts = request.getParts();
+        Iterator<Part> iterator = parts.iterator();
+        while (iterator.hasNext()) {
+            Part part = iterator.next();
+            String name = part.getName();
+            returnMap.put(name, part);
         }
         return returnMap;
     }
