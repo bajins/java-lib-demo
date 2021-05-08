@@ -17,6 +17,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -364,6 +365,25 @@ public class HttpUtil {
         while (attributeNames.hasMoreElements()) {
             String key = attributeNames.nextElement();
             Object attribute = request.getAttribute(key);
+            returnMap.put(key, attribute);
+        }
+        return returnMap;
+    }
+
+    /**
+     * 获取HttpServletRequest中session的Attribute并封装到Map<String, Object>
+     *
+     * @param request
+     * @return
+     */
+    public static Map<String, Object> getAttributeMapBySession(HttpServletRequest request) {
+        Objects.requireNonNull(request);
+        Map<String, Object> returnMap = new HashMap<>();
+        HttpSession session = request.getSession();
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String key = attributeNames.nextElement();
+            Object attribute = session.getAttribute(key);
             returnMap.put(key, attribute);
         }
         return returnMap;
