@@ -1,16 +1,19 @@
 package com.bajins.demo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JacksonLearning {
 
@@ -37,7 +40,8 @@ public class JacksonLearning {
 
         /*SimpleFilterProvider filterProvider = new SimpleFilterProvider();
         // Person类的属性过滤器（只序列化car,house,name字段）
-        filterProvider.addFilter("person", SimpleBeanPropertyFilter.filterOutAllExcept(Sets.newHashSet("car", "house", "name")));*/
+        filterProvider.addFilter("person", SimpleBeanPropertyFilter.filterOutAllExcept(Sets.newHashSet("car",
+        "house", "name")));*/
 
 
         // HashMap<String,String> 转json
@@ -113,3 +117,44 @@ public static class AppendPrefixStrategyForSetter extends PropertyNamingStrategy
         return defaultName;
     }
 }*/
+
+
+/**
+ * 出参保留两位小数
+ *
+ * @JsonDeserialize(using = DeserializerBigDecimal.class)
+ */
+class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
+    /**
+     * 出参保留两位小数
+     *
+     * @param jsonParser
+     * @param deserializationContext
+     * @return
+     * @throws IOException
+     * @throws JsonProcessingException
+     */
+    @Override
+    public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+        String value = jsonParser.getValueAsString();
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        // 这里取floor
+        return new BigDecimal(value).setScale(2, RoundingMode.FLOOR);
+    }
+}
+
+
+/**
+ * 入参保留两位小数
+ *
+ * @JsonSerialize(using = SerializerBigDecimal.class)
+ */
+class SerializerBigDecimal extends JsonSerializer<BigDecimal> {
+    @Override
+    public void serialize(BigDecimal bigDecimal, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        // 注意这里不能使用jsonGenerator.writeNumber(result);方法，不然又会把.00去掉
+        jsonGenerator.writeString(bigDecimal.setScale(2, RoundingMode.FLOOR).toPlainString());
+    }
+}
