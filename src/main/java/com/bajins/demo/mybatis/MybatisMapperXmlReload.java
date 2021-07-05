@@ -54,6 +54,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
         public void run() {
             startWatch();
         }
+
         /**
          * 启动监听
          */
@@ -112,7 +113,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
             ).forEach(fieldName -> {
                 Object value = getFieldValue(configuration, fieldName);
                 if (value instanceof Map) {
-                    Map<?, ?> map = (Map) value;
+                    Map<?, ?> map = (Map<?, ?>) value;
                     List<Object> list =
                             map.keySet().stream().filter(o -> o.toString().startsWith(nameSpace + ".")).collect(Collectors.toList());
                     logger.info("需要清理的元素: {}", list);
@@ -130,7 +131,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
             logger.info("清理mybatis的资源{}在容器中的缓存", resource);
             Object value = getFieldValue(configuration, "loadedResources");
             if (value instanceof Set) {
-                Set<?> set = (Set) value;
+                Set<?> set = (Set<?>) value;
                 set.remove(resource);
                 set.remove("namespace:" + resource);
             }

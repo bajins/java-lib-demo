@@ -62,7 +62,7 @@ public class MybatisMapperXmlLoader {
      */
     public String readMapperXml() {
         try {
-            org.apache.ibatis.session.Configuration configuration = sqlSessionFactory.getConfiguration();
+            Configuration configuration = sqlSessionFactory.getConfiguration();
             // 扫描文件
             this.scanMapperXml();
 
@@ -144,7 +144,7 @@ public class MybatisMapperXmlLoader {
             field = classConfig.getClass().getDeclaredField(fieldName);
         }
         field.setAccessible(true);
-        Map mapConfig = (Map) field.get(configuration);
+        Map<?, ?> mapConfig = (Map<?, ?>) field.get(configuration);
         mapConfig.clear();
     }
 
@@ -165,7 +165,7 @@ public class MybatisMapperXmlLoader {
             field = classConfig.getClass().getDeclaredField(fieldName);
         }
         field.setAccessible(true);
-        Set setConfig = (Set) field.get(configuration);
+        Set<?> setConfig = (Set<?>) field.get(configuration);
         setConfig.clear();
     }
 }

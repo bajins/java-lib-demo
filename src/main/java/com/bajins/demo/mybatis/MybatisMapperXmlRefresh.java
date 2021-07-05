@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class MybatisMapperXmlRefresh {
+
     private static final Logger logger = LoggerFactory.getLogger(MybatisMapperXmlRefresh.class);
 
     private Configuration configuration;
@@ -44,14 +45,14 @@ public class MybatisMapperXmlRefresh {
                     ? configuration.getClass().getSuperclass().getDeclaredField("loadedResources")
                     : configuration.getClass().getDeclaredField("loadedResources");
             loadedResourcesField.setAccessible(true);
-            Set loadedResourcesSet = ((Set) loadedResourcesField.get(configuration));
+            Set<?> loadedResourcesSet = ((Set<?>) loadedResourcesField.get(configuration));
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, configuration.getVariables(),
                     new XMLMapperEntityResolver());
             XNode context = xPathParser.evalNode("/mapper");
             String namespace = context.getStringAttribute("namespace");
             Field field = MapperRegistry.class.getDeclaredField("knownMappers");
             field.setAccessible(true);
-            Map mapConfig = (Map) field.get(configuration.getMapperRegistry());
+            Map<?, ?> mapConfig = (Map<?, ?>) field.get(configuration.getMapperRegistry());
             Collection<String> mappedStatementNames = configuration.getMappedStatementNames();
 
             mapConfig.remove(Resources.classForName(namespace));
