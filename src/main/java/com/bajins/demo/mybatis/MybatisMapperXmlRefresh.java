@@ -25,7 +25,7 @@ public class MybatisMapperXmlRefresh {
     private static final Logger logger = LoggerFactory.getLogger(MybatisMapperXmlRefresh.class);
 
     private Configuration configuration;
-    private SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory sqlSessionFactory;
 
     public MybatisMapperXmlRefresh(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
@@ -33,8 +33,6 @@ public class MybatisMapperXmlRefresh {
 
     /**
      * 刷新mapper
-     *
-     * @throws Exception
      */
     private void refresh(Resource resource)
             throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
@@ -134,14 +132,9 @@ public class MybatisMapperXmlRefresh {
 
             Collection<MappedStatement> mappedStatements = configuration.getMappedStatements();
             List<MappedStatement> objects = Lists.newArrayList();
-            Iterator<MappedStatement> it = mappedStatements.iterator();
-            while (it.hasNext()) {
-                Object object = it.next();
-                if (object instanceof org.apache.ibatis.mapping.MappedStatement) {
-                    MappedStatement mappedStatement = (MappedStatement) object;
-                    if (mappedStatement.getId().equals(namespace + "." + id)) {
-                        objects.add(mappedStatement);
-                    }
+            for (MappedStatement object : mappedStatements) {
+                if (object != null && object.getId().equals(namespace + "." + id)) {
+                    objects.add(object);
                 }
             }
             mappedStatements.removeAll(objects);

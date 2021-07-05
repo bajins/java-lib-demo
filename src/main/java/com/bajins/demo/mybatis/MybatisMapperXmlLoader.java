@@ -51,7 +51,7 @@ public class MybatisMapperXmlLoader {
     public void startThreadListener() {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         //每10秒执行一次
-        service.scheduleAtFixedRate(() -> readMapperXml(), 0, 10, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(this::readMapperXml, 0, 10, TimeUnit.SECONDS);
         readMapperXml();
     }
 
@@ -66,22 +66,19 @@ public class MybatisMapperXmlLoader {
             // 扫描文件
             this.scanMapperXml();
 
-            if (true) {
-                // 清空configuration map的数据
-                this.removeConfig(configuration);
+            // 清空configuration map的数据
+            this.removeConfig(configuration);
 
-                // 将xml 重新加载
-                for (Resource configLocation : mapperLocations) {
-                    if ("TestMapper.xml".equals(configLocation.getFilename())) {
-                        try {
-                            XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(configLocation.getInputStream(),
-                                    configuration, configLocation.toString(), configuration.getSqlFragments());
-                            xmlMapperBuilder.parse();
-                            logger.debug("mapper文件[" + configLocation.getFilename() + "]缓存加载成功");
-                        } catch (IOException e) {
-                            logger.debug("mapper文件[" + configLocation.getFilename() + "]不存在或内容格式不对");
-                            continue;
-                        }
+            // 将xml 重新加载
+            for (Resource configLocation : mapperLocations) {
+                if ("TestMapper.xml".equals(configLocation.getFilename())) {
+                    try {
+                        XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(configLocation.getInputStream(),
+                                configuration, configLocation.toString(), configuration.getSqlFragments());
+                        xmlMapperBuilder.parse();
+                        logger.debug("mapper文件[" + configLocation.getFilename() + "]缓存加载成功");
+                    } catch (IOException e) {
+                        logger.debug("mapper文件[" + configLocation.getFilename() + "]不存在或内容格式不对");
                     }
                 }
             }
@@ -104,6 +101,7 @@ public class MybatisMapperXmlLoader {
                 , "src/main");
         File file = new File(fileUrl);
         File[] matchingFiles = file.listFiles();
+        assert matchingFiles != null;
         Set<Resource> result = new LinkedHashSet<>(matchingFiles.length);
         for (File files : matchingFiles) {
             result.add(new FileSystemResource(files));
@@ -141,7 +139,7 @@ public class MybatisMapperXmlLoader {
         if (configuration.getClass().getName().equals("com.bajins.com.MybatisConfiguration")) {
             field = classConfig.getSuperclass().getDeclaredField(fieldName);
         } else {
-            field = classConfig.getClass().getDeclaredField(fieldName);
+            field = classConfig.getDeclaredField(fieldName);
         }
         field.setAccessible(true);
         Map<?, ?> mapConfig = (Map<?, ?>) field.get(configuration);
@@ -162,7 +160,7 @@ public class MybatisMapperXmlLoader {
         if (configuration.getClass().getName().equals("com.bajins.com.MybatisConfiguration")) {
             field = classConfig.getSuperclass().getDeclaredField(fieldName);
         } else {
-            field = classConfig.getClass().getDeclaredField(fieldName);
+            field = classConfig.getDeclaredField(fieldName);
         }
         field.setAccessible(true);
         Set<?> setConfig = (Set<?>) field.get(configuration);

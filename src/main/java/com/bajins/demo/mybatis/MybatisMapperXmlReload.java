@@ -117,7 +117,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
                     List<Object> list =
                             map.keySet().stream().filter(o -> o.toString().startsWith(nameSpace + ".")).collect(Collectors.toList());
                     logger.info("需要清理的元素: {}", list);
-                    list.forEach(k -> map.remove(k));
+                    list.forEach(map::remove);
                 }
             });
         }
@@ -196,7 +196,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
                     xmlMapperBuilder.parse();
                 } catch (Exception e) {
                     logger.info("ERROR: 重新加载[{}]失败", r.toString(), e);
-                    throw new RuntimeException("ERROR: 重新加载[" + r.toString() + "]失败", e);
+                    throw new RuntimeException("ERROR: 重新加载[" + r + "]失败", e);
                 } finally {
                     ErrorContext.instance().reset();
                 }
