@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 此类主要将项目启动时xml文件加载到 sqlSessionFactory 中的 Configuration缓存清除
  * ,再扫描本地xml加入到该缓存中,从而达到,xml没有经过编译也可以实现实时更新
- * ，网上也有其他的加载的编译后的xml,也就是build路径加的xml,但如果项目没有编译,xml无法实时更新
+ * ，网上也有其他的加载的编译后的xml方案,也就是build路径加的xml,但如果项目没有编译,xml无法实时更新
  * ,注意scanMapperXml()方法的路径你要换成自己对应的XML文件路径
  * <p>
  * 手动刷新 new XMLMapperLoader(sqlSessionFactory,"/mapper").readMapperXml()
@@ -42,7 +42,9 @@ public class MybatisMapperXmlLoader {
         if (StringUtils.hasText(packageSearchPath)) {
             this.packageSearchPath = packageSearchPath;
         }
-        startThreadListener();
+        if (logger.isDebugEnabled()) { // 开发环境才自动刷新
+            startThreadListener();
+        }
     }
 
     /**
@@ -50,7 +52,7 @@ public class MybatisMapperXmlLoader {
      */
     public void startThreadListener() {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        //每10秒执行一次
+        // 每10秒执行一次
         service.scheduleAtFixedRate(this::readMapperXml, 0, 10, TimeUnit.SECONDS);
         readMapperXml();
     }

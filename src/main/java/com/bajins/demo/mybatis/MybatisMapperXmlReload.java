@@ -1,6 +1,5 @@
 package com.bajins.demo.mybatis;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.executor.ErrorContext;
@@ -31,10 +30,7 @@ public class MybatisMapperXmlReload implements InitializingBean, ApplicationCont
 
     @Override
     public void afterPropertiesSet() {
-        String flag = ResourceBundle.getBundle("com/test/config/config.properties").getString("mapper.hot.deploy");
-        logger.info("Mybatis热部署标识mapper.hot.deploy={}", flag);
-        // 判断是否开启了热部署
-        if (StringUtils.isNotBlank(flag) && OPEN.equals(flag)) {
+        if (logger.isDebugEnabled()) { // 开发环境才自动刷新
             new WatchThread().start();
         }
     }

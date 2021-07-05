@@ -39,22 +39,25 @@ public class MybatisMapperXmlRefresh {
         this.configuration = sqlSessionFactory.getConfiguration();
         boolean isSupper = configuration.getClass().getSuperclass() == Configuration.class;
         try {
+            XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, configuration.getVariables(),
+                    new XMLMapperEntityResolver());
+            XNode context = xPathParser.evalNode("/mapper");
+            String namespace = context.getStringAttribute("namespace");
+
+            Field field = MapperRegistry.class.getDeclaredField("knownMappers");
+            field.setAccessible(true);
+            Map<?, ?> mapConfig = (Map<?, ?>) field.get(configuration.getMapperRegistry());
+            //Collection<String> mappedStatementNames = configuration.getMappedStatementNames();
+
+            mapConfig.remove(Resources.classForName(namespace));
+
             Field loadedResourcesField = isSupper
                     ? configuration.getClass().getSuperclass().getDeclaredField("loadedResources")
                     : configuration.getClass().getDeclaredField("loadedResources");
             loadedResourcesField.setAccessible(true);
             Set<?> loadedResourcesSet = ((Set<?>) loadedResourcesField.get(configuration));
-            XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, configuration.getVariables(),
-                    new XMLMapperEntityResolver());
-            XNode context = xPathParser.evalNode("/mapper");
-            String namespace = context.getStringAttribute("namespace");
-            Field field = MapperRegistry.class.getDeclaredField("knownMappers");
-            field.setAccessible(true);
-            Map<?, ?> mapConfig = (Map<?, ?>) field.get(configuration.getMapperRegistry());
-            Collection<String> mappedStatementNames = configuration.getMappedStatementNames();
-
-            mapConfig.remove(Resources.classForName(namespace));
             loadedResourcesSet.remove(resource.toString());
+
             configuration.getCacheNames().remove(namespace);
 
             cleanParameterMap(context.evalNodes("/mapper/parameterMap"), namespace);
@@ -65,6 +68,7 @@ public class MybatisMapperXmlRefresh {
                     sqlSessionFactory.getConfiguration(), resource.toString(),
                     sqlSessionFactory.getConfiguration().getSqlFragments());
             xmlMapperBuilder.parse();
+
             logger.debug("refresh: '" + resource + "', success!");
         } catch (IOException e) {
             logger.error("Refresh IOException :" + e.getMessage());
