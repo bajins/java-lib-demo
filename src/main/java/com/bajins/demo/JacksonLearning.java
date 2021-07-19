@@ -125,15 +125,6 @@ public static class AppendPrefixStrategyForSetter extends PropertyNamingStrategy
  * @JsonDeserialize(using = DeserializerBigDecimal.class)
  */
 class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
-    /**
-     * 出参保留两位小数
-     *
-     * @param jsonParser
-     * @param deserializationContext
-     * @return
-     * @throws IOException
-     * @throws JsonProcessingException
-     */
     @Override
     public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         String value = jsonParser.getValueAsString();
@@ -154,7 +145,7 @@ class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
 class SerializerBigDecimal extends JsonSerializer<BigDecimal> {
     @Override
     public void serialize(BigDecimal bigDecimal, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        // 注意这里不能使用jsonGenerator.writeNumber(result);方法，不然又会把.00去掉
+        // 注意这里不能使用jsonGenerator.writeNumber(result);方法，不然会把.00去掉
         jsonGenerator.writeString(bigDecimal.setScale(2, RoundingMode.FLOOR).toPlainString());
     }
 }

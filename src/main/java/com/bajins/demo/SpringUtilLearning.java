@@ -4,6 +4,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -109,6 +110,10 @@ public class SpringUtilLearning {
 
         Properties properties = PropertiesLoaderUtils.loadAllProperties("com/test/config/config.properties");
         System.out.println(properties.getProperty("key"));
+
+        // Spring也是支持很友好的编码解决的~~~
+        /*Properties properties = PropertiesLoaderUtils.loadProperties(new EncodedResource(
+                new ClassPathResource("my.properties"), StandardCharsets.UTF_8));*/
 
         ClassPathResource classPathResource = new ClassPathResource("com/test/config/config.properties");
 
