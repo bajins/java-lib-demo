@@ -3,15 +3,14 @@ package com.bajins.demo;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateExceptionHandler;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.springframework.util.StringUtils;
 
 import java.io.StringWriter;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,6 +69,7 @@ public class TemplateLearning {
 
     /**
      * Freemarker渲染模板
+     * https://freemarker.apache.org/docs/ref_builtins_date.html
      *
      * @param template 模版
      * @param params   参数
@@ -97,10 +97,12 @@ public class TemplateLearning {
             // <#escape x as x!"">null替换为空字符串</#escape> <#noescape>不处理null</#noescape>
             /* ${user?if_exists} ${user!''} ${user!} ${user?default('')} ${user???string(user,'')} */
             cfg.setClassicCompatible(true);// 为null则替换为空字符串
-            cfg.setTimeZone(TimeZone.getTimeZone("GMT> 08:00"));// 获取东八区时间
+            cfg.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));// 获取东八区时间
             cfg.setTimeFormat("HH:mm:ss.SSS");// 时间格式化
             cfg.setDateFormat("yyyy-MM-dd");// 日期格式化
             cfg.setDateTimeFormat("yyyy-MM-dd HH:mm:ss.SSS");// 日期时间格式化
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            //Template tpl = new Template("content", template, cfg);
             Template tpl = cfg.getTemplate("content");
             StringWriter writer = new StringWriter();
             tpl.process(params, writer);
@@ -113,5 +115,11 @@ public class TemplateLearning {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("date", new Date());
+        System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}", map));
     }
 }
