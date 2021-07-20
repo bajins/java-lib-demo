@@ -7,7 +7,37 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class GuavaLearning {
+    /**
+     * 判断是否为驼峰
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isCamel(String str) {
+        boolean lower = false;
+        boolean upper = false;
+        for (int i = 0; i < str.length(); i++) {
+            char charAt = str.charAt(i);
+            if (Character.isLowerCase(charAt)) {
+                lower = true;
+            } else if (Character.isUpperCase(charAt)) {
+                upper = true;
+            }
+            if (lower && upper) {
+                break;
+            }
+        }
+        return lower && upper;
+    }
+
     public static void main(String[] args) {
+        /* https://github.com/google/guava http://www.ibloger.net/article/3294.html
+        LOWER_CAMEL	        Java变量的命名规则	        lowerCamel
+        LOWER_HYPHEN	    连字符连接变量的命名规则	    lower-hyphen
+        LOWER_UNDERSCORE	C ++变量命名规则	        lower_underscore
+        UPPER_CAMEL	        Java和C++类的命名规则	    UpperCamel
+        UPPER_UNDERSCORE	Java和C++常量的命名规则	UPPER_UNDERSCORE
+         */
         List<Integer> intList = Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8);
         // 将一个list按三个一组分成N个小的list，
         // partition返回的是原list的subview视图，即原list改变后，partition之后的结果也会随着改变
@@ -16,9 +46,11 @@ public class GuavaLearning {
         List<Integer> firstPartition = subSets.iterator().next();
         List<Integer> expectedLastPartition = Lists.newArrayList(7, 8);
 
-        // 字符串大写字母转下划线 https://blog.csdn.net/u014082714/article/details/101701372
+        // 字符串大写字母转下划线
         String name = "TestStringName";
-        System.out.println(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name));
+        if (!name.contains("_") && isCamel(name)) { // 如果有下划线则不进行驼峰转下划线，且有小写同时也有大写才进行转换
+            System.out.println(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name));
+        }
 
         // List转Map
         /*Map<Long, User> maps = Maps.uniqueIndex(userList, new Function<User, Long>() {
