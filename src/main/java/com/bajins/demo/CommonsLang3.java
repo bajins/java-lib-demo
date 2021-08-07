@@ -258,8 +258,8 @@ public class CommonsLang3 {
         /**
          * org.apache.commons.lang3.tuple包下有：
          * <p>
-         * Pair 封装一对键值对，实现类：可变：MutablePair<L,R>，不可变：ImmutablePair<L,R>
-         * Triple 封装3个值的类，实现类：ImmutableTriple<L,M,R>; MutableTriple<L,M,R>
+         * Pair 封装一对键值对，实现类：可变 MutablePair<L,R>，不可变 ImmutablePair<L,R>
+         * Triple 封装3个值的类，实现类：可变 MutableTriple<L,M,R>，不可变 ImmutableTriple<L,M,R>
          * </p>
          * https://github.com/vavr-io/vavr 也有元组实现
          */
