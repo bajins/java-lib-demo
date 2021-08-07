@@ -4,6 +4,7 @@ import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -255,16 +256,18 @@ public class CommonsLang3 {
 
 
         /**
-         * Pair：封装一对键值对
-         *         实现类：可变：MutablePair<L,R>，不可变：ImmutablePair
-         * Triple：封装3个值的类
-         *         实现类：ImmutableTriple; MuttableTriple<L,M,R>
-         *
+         * org.apache.commons.lang3.tuple包下有：
+         * <p>
+         * Pair 封装一对键值对，实现类：可变：MutablePair<L,R>，不可变：ImmutablePair<L,R>
+         * Triple 封装3个值的类，实现类：ImmutableTriple<L,M,R>; MutableTriple<L,M,R>
+         * </p>
          * https://github.com/vavr-io/vavr 也有元组实现
          */
         Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");
         System.out.println(of.getLeft());
 
+        ImmutableTriple<String, String, String> three = ImmutableTriple.of("1", "2", "3");
+        System.out.println(three.left);
 
     }
 
