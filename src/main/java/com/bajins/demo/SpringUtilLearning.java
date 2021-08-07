@@ -6,6 +6,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -132,5 +133,9 @@ public class SpringUtilLearning {
         //org.springframework.beans.BeanUtils.copyProperties();
         //org.springframework.cglib.beans.BeanCopier.create().copy();
         //BeanUtils.copyProperties(Object source, Object target, String... ignoreProperties);
+
+        // 二元组
+        Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");
+        System.out.println(of.getFirst());
     }
 }

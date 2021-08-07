@@ -4,6 +4,7 @@ import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.beans.IntrospectionException;
@@ -16,6 +17,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ *
+ */
 public class CommonsLang3 {
 
     /**
@@ -248,6 +252,19 @@ public class CommonsLang3 {
         String[] split = StringUtils.split("s,t,r", ",");
         // 使用org.apache.commons.lang3.StringUtils.countMatches查找并统计子串出现在字符串中的次数
         int i1 = StringUtils.countMatches("abba", "a");
+
+
+        /**
+         * Pair：封装一对键值对
+         *         实现类：可变：MutablePair<L,R>，不可变：ImmutablePair
+         * Triple：封装3个值的类
+         *         实现类：ImmutableTriple; MuttableTriple<L,M,R>
+         *
+         * https://github.com/vavr-io/vavr 也有元组实现
+         */
+        Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");
+        System.out.println(of.getLeft());
+
 
     }
 
