@@ -89,7 +89,7 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
                 }
             }
             try {
-                FileUtils.copyFile(file, destPath.toFile());
+                FileUtils.copyFile(file, destPath.resolve(file.getName()).toFile());
 
                 // 此方式：文件或目录被其他进程占用无法复制
                 // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
