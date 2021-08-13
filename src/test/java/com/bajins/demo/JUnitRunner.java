@@ -23,21 +23,13 @@ import java.nio.file.Paths;
  * 参考 https://www.jianshu.com/p/6c279b4d7f5c<br/>
  * 在spring里面存在spring.schemas spring在解析的时候会自动映射，mybatis也是同样道理<br/>
  * 当解析到dtd时自动映射成对应jar下面的文件，这样无需去网络获取<br/>
- * @see org.apache.ibatis.builder.xml.XMLMapperEntityResolver mybatis默认解析类
- *
  * <p>
  * 需修改spring-mybatis.xml中的mybatis-3-config.dtd为本地绝对路径，解决报错：Connection refused: connect <br/>
  * 修改spring-context-web.xml中/WEB-INF/views.xml为file:webapp/WEB-INF/views.xml，<br/>
  * 解决报错：Could not open ServletContext resource [/WEB-INF/views.xml]
  * </p>
  *
- * @Title: JUnitRunner.java
- * @Package com.bajins.demo
- * @Description:
- * @author: https://www.bajins.com
- * @date: 2021-1-12 13:52:43
- * @version V1.0
- * @Copyright: 2021 bajins.com Inc. All rights reserved.
+ * @see org.apache.ibatis.builder.xml.XMLMapperEntityResolver mybatis默认解析类
  */
 public class JUnitRunner extends SpringJUnit4ClassRunner {
 
