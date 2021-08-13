@@ -6,15 +6,14 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 //@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(JUnitRunner.class)
 //@AutoConfigureMockMvc
 @WebAppConfiguration
 @ContextConfiguration(locations = {
@@ -24,49 +23,15 @@ import javax.sql.DataSource;
 })
 public class DemoTest {
 
-    /*@Resource
-    private DataSource dataSource;*/
-    /*private static String[] springFiles = { "beans/my-beans-config.xml" };
-    private ClassPathXmlApplicationContext context;*/
 
+    @Before
+    public static void before() {
+        System.out.println("运行测试之前，会运行多次");
+    }
 
     @BeforeClass
-    public static void initClass() throws NamingException {
-        // 服务器(比如tomcat)启动时,它有自己的容器加载JNDI,而在junit里，没有这个JNDI
-        // org.springframework.mock.jndi软件包中提供的功能来模拟数据源
-        /*context = new ClassPathXmlApplicationContext(springFiles);
-        DataSource dataSource = (DataSource) context.getBean("dataSource");*/
-
-        // 使用org.springframework.jdbc.datasource.DriverManagerDataSource创建数据源
-        /*DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("com.mysql.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://localhost:8088/test");
-        ds.setUsername("root");
-        ds.setPassword("1234");*/
-
-        // alibaba的druid获取 datasource
-        /*Map<String, String> map = new HashMap<>();
-        map.put(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, drive);
-        map.put(DruidDataSourceFactory.PROP_URL, url);
-        map.put(DruidDataSourceFactory.PROP_USERNAME, username);
-        map.put(DruidDataSourceFactory.PROP_PASSWORD, password);
-        DataSource ds = DruidDataSourceFactory.createDataSource(map);*/
-
-        // org.springframework.jndi.JndiObjectFactoryBean获取JNDI数据源配置信息
-        // InitialContext 在应用服务器（如Tomcat）的上下文里才存在。
-        // 不能用main函数直接测试，只能放到tomcat或者servlet、jsp显示
-        /*Tomcat tomcat = new Tomcat();
-        tomcat.enableNaming(); // 启用tomcat的JNDI
-        tomcat.start();
-        tomcat.getServer().await();*/
-        /*Context context = new InitialContext();
-        DataSource ds = (DataSource)context.lookup("java:comp/env/myDataSourceJNDI");*/
-        //DataSource ds = (DataSource)InitialContext.doLookup("java:comp/env/myDataSourceJNDI");
-
-        //SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
-        /*SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
-        //builder.bind("java:comp/env/myDataSourceJNDI", dataSource);
-        builder.activate();*/
+    public static void beforeClass() {
+        System.out.println("运行测试之前，且只运行一次");
     }
 
     /**
@@ -76,15 +41,15 @@ public class DemoTest {
     public void init() {
         System.out.println("ehcache缓存目录:" + System.getProperty("java.io.tmpdir"));
         try {
-            ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext("classpath:spring/springtest" +
-                    "/InitJndi.xml");
+            ClassPathXmlApplicationContext app = new ClassPathXmlApplicationContext(
+                    "classpath:spring/springtest/InitJndi.xml");
             DataSource ds = (DataSource) app.getBean("dataSource");
             /*SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
             builder.bind("java:comp/env/jdbc/db1", ds);
             builder.activate();
 
-            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext("classpath:spring/spring
-            .xml");
+            ClassPathXmlApplicationContext appcontext = new ClassPathXmlApplicationContext(
+            "classpath:spring/spring.xml");
 
             //这里提取测试bean
             testCacheService = (TestCacheService) appcontext.getBean("testCacheService");

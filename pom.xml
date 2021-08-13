@@ -276,6 +276,32 @@
             <version>3.4.0</version>
         </dependency>
 
+        <!--=========================== 测试 start ===========================-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>-->
+        <!-- 解决Junit测试报找不到webSocketHandlerMapping错误，9.3.x以后版本不支持Spring4.3以下版本 -->
+        <!--<dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-server</artifactId>
+            <version>9.2.25.v20180606</version>
+            <scope>test</scope>
+        </dependency>-->
+        <!--=========================== 测试 end ===========================-->
+
     </dependencies>
 
     <!-- 执行 mvn clean package -P prod 命令指定环境打包，
