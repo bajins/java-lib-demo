@@ -65,6 +65,8 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
 
         for (File file : listFiles) {
 
+            File destFile = destPath.resolve(file.getName()).toFile();
+
             if (file.getName().equals("spring-mybatis.xml")) {
                 try {
                     DocumentBuilder builder = factory.newDocumentBuilder();
@@ -82,32 +84,33 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
                     transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "-//mybatis.org//DTD Config 3.0//EN");
                     // 把xml中的dtd指向到缓存目录
                     transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, dtdTempPath.toAbsolutePath().toString());
-                    transformer.transform(new DOMSource(document), new StreamResult(file));
+                    transformer.transform(new DOMSource(document), new StreamResult(destFile));
 
                 } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
                     e.printStackTrace();
                 }
-            }
-            try {
-                FileUtils.copyFile(file, destPath.resolve(file.getName()).toFile());
+            } else {
+                try {
+                    FileUtils.copyFile(file, destFile);
 
-                // 此方式：文件或目录被其他进程占用无法复制
-                // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
+                    // 此方式：文件或目录被其他进程占用无法复制
+                    // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
 
-                /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " + destPath);
-                if (exec.isAlive()) { // 运行结束
-                    System.out.println(exec.exitValue());
-                    try (InputStream inputStream = exec.getInputStream();
-                            InputStreamReader isr = new InputStreamReader(inputStream, "GBK");
-                            BufferedReader br = new BufferedReader(isr)) {
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            System.out.println(line);
+                    /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " + destPath);
+                    if (exec.isAlive()) { // 运行结束
+                        System.out.println(exec.exitValue());
+                        try (InputStream inputStream = exec.getInputStream();
+                                InputStreamReader isr = new InputStreamReader(inputStream, "GBK");
+                                BufferedReader br = new BufferedReader(isr)) {
+                            String line = null;
+                            while ((line = br.readLine()) != null) {
+                                System.out.println(line);
+                            }
                         }
-                    }
-                }*/
-            } catch (IOException e) {
-                e.printStackTrace();
+                    }*/
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
