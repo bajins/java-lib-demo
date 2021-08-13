@@ -1,5 +1,6 @@
 package com.bajins.demo;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -14,7 +15,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -39,50 +42,70 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
     private ClassPathXmlApplicationContext context;*/
 
     static {
-        String projectDir = System.getProperty("user.dir");
+        String projectDir = System.getProperty("user.dir"); // 当前项目目录
+        String tmpDir = System.getProperty("java.io.tmpdir"); // 缓存目录
+        Path tempDirPath = Paths.get(tmpDir);
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Path destPath = Paths.get(projectDir, "webapp", "WEB-INF", "classes");
-
         Path configTestDir = Paths.get(projectDir, "configtest");
+
+        Path dtd = configTestDir.resolve("mybatis-3-config.dtd");
+        Path dtdTempPath = tempDirPath.resolve(dtd.getFileName());
+        File dtdFile = dtd.toFile();
+        if (dtdFile.exists()) {
+            try {
+                FileUtils.copyFile(dtdFile, dtdTempPath.toFile()); // 把dtd文件复制到缓存目录
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         File configTestDirFile = configTestDir.toFile();
         File[] listFiles = configTestDirFile.listFiles((dir, name) -> name.endsWith(".xml") || name.endsWith(".dtd"));
 
         for (File file : listFiles) {
+
             if (file.getName().equals("spring-mybatis.xml")) {
-                String dtd = destPath.resolve("mybatis-3-config.dtd").toAbsolutePath().toString();
                 try {
                     DocumentBuilder builder = factory.newDocumentBuilder();
-                    builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
+                    builder.setEntityResolver((publicId, systemId) -> {
+                        // return new InputSource(new ByteArrayInputStream("".getBytes()));
+                        return new InputSource(new StringReader(""));
+                    });
                     Document document = builder.parse(file);
                     document.setXmlStandalone(false);
+                    // document.setXmlVersion("1.0");
 
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // 换行
                     transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "-//mybatis.org//DTD Config 3.0//EN");
-                    // transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, dtd);
-                    transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,
-                            "C:\\Users\\admin\\.lemminx\\cache\\http\\mybatis.org\\dtd\\mybatis-3-config.dtd");
+                    // 把xml中的dtd指向到缓存目录
+                    transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, dtdTempPath.toAbsolutePath().toString());
                     transformer.transform(new DOMSource(document), new StreamResult(file));
+
                 } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
                     e.printStackTrace();
                 }
             }
             try {
-                Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " + destPath);
-                /*if (exec.isAlive()) { // 运行结束
-                    System.out.println(exec.exitValue());
-                }*/
-                try (InputStream inputStream = exec.getInputStream();
-                     InputStreamReader isr = new InputStreamReader(inputStream, "GBK");
-                     BufferedReader br = new BufferedReader(isr)) {
-                    String line = null;
-                    while ((line = br.readLine()) != null) {
-                        System.out.println(line);
-                    }
-                }
+                FileUtils.copyFile(file, destPath.toFile());
+
+                // 此方式：文件或目录被其他进程占用无法复制
                 // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
+
+                /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " + destPath);
+                if (exec.isAlive()) { // 运行结束
+                    System.out.println(exec.exitValue());
+                    try (InputStream inputStream = exec.getInputStream();
+                            InputStreamReader isr = new InputStreamReader(inputStream, "GBK");
+                            BufferedReader br = new BufferedReader(isr)) {
+                        String line = null;
+                        while ((line = br.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    }
+                }*/
             } catch (IOException e) {
                 e.printStackTrace();
             }
