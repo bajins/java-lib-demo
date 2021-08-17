@@ -238,7 +238,15 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
             } catch (Throwable e) {
                 errors.add(e);
             } finally { // 最终执行
-                System.out.println();
+                String projectDir = System.getProperty("user.dir");// 当前项目目录
+                Path configPath = Paths.get(projectDir, "config");
+                Path destPath = Paths.get(projectDir, "webapp", "WEB-INF", "classes");
+
+                Path scwPath = configPath.resolve("spring-context-web.xml");
+                FileUtils.copyFile(scwPath.toFile(), destPath.resolve(scwPath.getFileName()).toFile());
+
+                Path mxPath = configPath.resolve("spring-mybatis.xml");
+                FileUtils.copyFile(mxPath.toFile(), destPath.resolve(mxPath.getFileName()).toFile());
             }
             MultipleFailureException.assertEmpty(errors);
         }
