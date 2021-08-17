@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.sql.DataSource;
@@ -21,7 +22,8 @@ import javax.sql.DataSource;
         "classpath:application-dev.properties",
         /*"file:WebContent/META-INF/datasource-test.xml"*/
 })
-public class DemoTest {
+//@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
+public class DemoTest extends AbstractTransactionalJUnit4SpringContextTests {
 
 
     @Before

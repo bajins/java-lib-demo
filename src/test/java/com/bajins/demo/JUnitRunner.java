@@ -1,6 +1,11 @@
 package com.bajins.demo;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.ParentRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.MultipleFailureException;
+import org.junit.runners.model.Statement;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -20,6 +25,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 解决内网情况下，DTD验证失败<br/>
@@ -34,6 +41,7 @@ import java.nio.file.Paths;
  *
  * @see org.apache.ibatis.builder.xml.XMLMapperEntityResolver mybatis默认解析类
  */
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class JUnitRunner extends SpringJUnit4ClassRunner {
 
     /*@Resource
@@ -96,7 +104,8 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
                     // 此方式：文件或目录被其他进程占用无法复制
                     // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
 
-                    /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " + destPath);
+                    /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " +
+                    destPath);
                     if (exec.isAlive()) { // 运行结束
                         System.out.println(exec.exitValue());
                         try (InputStream inputStream = exec.getInputStream();
@@ -160,6 +169,79 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
         /*SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
         //builder.bind("java:comp/env/myDataSourceJNDI", dataSource);
         builder.activate();*/
+    }
+
+    @Override
+    public void run(RunNotifier notifier) {
+        super.run(notifier);
+    }
+
+    @Override
+    protected Statement withBeforeClasses(Statement statement) {
+        /*if (statement instanceof RunBefores) {
+
+        } else if (statement instanceof RunBeforeTestClassCallbacks) {
+
+        }*/
+        return super.withBeforeClasses(statement);
+    }
+
+    @Override
+    protected Statement withAfterClasses(Statement statement) {
+        statement = super.withAfterClasses(statement);
+        /*if (statement instanceof RunAfters) {
+
+        } else if (statement instanceof RunAfterTestClassCallbacks) {
+
+        } else if (statement instanceof ExpectException) {
+
+        }*/
+        return new RunAfterFinally(statement);
+    }
+
+    @Override
+    protected Statement withBefores(FrameworkMethod frameworkMethod, Object testInstance, Statement statement) {
+        return super.withBefores(frameworkMethod, testInstance, statement);
+    }
+
+    @Override
+    protected Statement withAfters(FrameworkMethod frameworkMethod, Object testInstance, Statement statement) {
+        return super.withAfters(frameworkMethod, testInstance, statement);
+    }
+
+    @Override
+    protected Statement withPotentialRepeat(FrameworkMethod frameworkMethod, Object testInstance, Statement next) {
+        return super.withPotentialRepeat(frameworkMethod, testInstance, next);
+    }
+
+    /**
+     * 最后只执行一次：finally<br/>
+     * https://www.cnblogs.com/jinsdu/p/4709270.html<br/>
+     * https://www.cnblogs.com/linkworld/p/9061967.html
+     *
+     * @see ParentRunner#withAfterClasses(org.junit.runners.model.Statement)
+     * @see org.junit.internal.runners.statements.RunAfters#evaluate()
+     */
+    public static class RunAfterFinally extends Statement {
+
+        private final Statement next;
+
+        public RunAfterFinally(Statement next) {
+            this.next = next;
+        }
+
+        @Override
+        public void evaluate() throws Throwable {
+            List<Throwable> errors = new ArrayList<>();
+            try {
+                next.evaluate();
+            } catch (Throwable e) {
+                errors.add(e);
+            } finally { // 最终执行
+                System.out.println();
+            }
+            MultipleFailureException.assertEmpty(errors);
+        }
     }
 
 }
