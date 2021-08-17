@@ -215,7 +215,7 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
     }
 
     /**
-     * 最后只执行一次：finally<br/>
+     * 最后只执行一次：比@AfterClass还要后执行finally中的代码<br/>
      * https://www.cnblogs.com/jinsdu/p/4709270.html<br/>
      * https://www.cnblogs.com/linkworld/p/9061967.html
      *
