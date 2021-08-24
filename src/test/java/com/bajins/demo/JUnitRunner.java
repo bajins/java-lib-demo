@@ -165,6 +165,7 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
         DataSource ds = (DataSource)context.lookup("java:comp/env/myDataSourceJNDI");*/
         //DataSource ds = (DataSource)InitialContext.doLookup("java:comp/env/myDataSourceJNDI");
 
+        // 加载绑定JNDI到应用服务器容器
         //SimpleNamingContextBuilder builder = new SimpleNamingContextBuilder();
         /*SimpleNamingContextBuilder builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
         //builder.bind("java:comp/env/myDataSourceJNDI", dataSource);
