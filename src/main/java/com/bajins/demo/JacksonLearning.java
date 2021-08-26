@@ -25,6 +25,18 @@ import java.util.*;
 
 public class JacksonLearning {
 
+    /**
+     * 如果有内部类，在进行绑定时是采用的静态类调用方式创建内部类实例，即 Demo.new InnerDemo()，所以需要在内部类上使用static关键字
+     * <p>
+     * JackSon拒绝尝试使用非静态内部类的基本原因（序列化是可以正常工作的）：<br/>
+     * 是因为这样的类没有实例化的一般方法，没有无参数的构造函数，
+     * 也没有@jsoncreator注释其他构造函数或工厂方法（或单个字符串参数的构造函数）
+     * </p>
+     * 非静态内部类（包括匿名内部类）被编译器通过隐藏的构造器传递了一组隐藏变量，直接结果就是：<br/>
+     * 无默认构造函数，即使代码里面有一个显式声明的无参构造函数
+     *
+     * @throws IOException
+     */
     private static void testJackJson() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         // 排除json字符串中实体类没有的字段 @JsonIgnore
@@ -47,10 +59,13 @@ public class JacksonLearning {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         // https://zhuanlan.zhihu.com/p/277834439
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter));
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(dateTimeFormatter));
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(dateTimeFormatter));
+
         objectMapper.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, false); // true忽略已被注册的 module
         objectMapper.registerModule(javaTimeModule); // 避免无效，先把IGNORE_DUPLICATE_MODULE_REGISTRATIONS设为false
         objectMapper.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, true);
