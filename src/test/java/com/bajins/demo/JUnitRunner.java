@@ -20,9 +20,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -105,12 +103,13 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
                     // Files.copy(Paths.get(file.getAbsolutePath()), destPath, StandardCopyOption.REPLACE_EXISTING);
 
                     /*Process exec = Runtime.getRuntime().exec("cmd /c copy " + file.getAbsolutePath() + " " +
-                    destPath);
+                            destPath);
                     if (exec.isAlive()) { // 运行结束
                         System.out.println(exec.exitValue());
                         try (InputStream inputStream = exec.getInputStream();
-                                InputStreamReader isr = new InputStreamReader(inputStream, "GBK");
-                                BufferedReader br = new BufferedReader(isr)) {
+                             InputStreamReader isr = new InputStreamReader(
+                                     inputStream, System.getProperty("sun.jnu.encoding"));
+                             BufferedReader br = new BufferedReader(isr)) {
                             String line = null;
                             while ((line = br.readLine()) != null) {
                                 System.out.println(line);
