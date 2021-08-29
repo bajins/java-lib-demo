@@ -7,6 +7,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
+
+
+/**
+ * 在spring中使用aop注入时需注意：spring可能有RestTemplate的默认配置（请求头等），导致在某些情况下会有差异，所以最好是自己进行初始化
+ */
 public class RestTemplateLearning {
 
     public static void main(String[] args) throws JsonProcessingException {
@@ -41,5 +47,9 @@ public class RestTemplateLearning {
 
         String result = restTemplate.postForObject("http://posturl", formEntity, String.class);
 
+
+        String url = "https://test.com/tags/{1}/test?page={2}&count={3}&order=new&before_timestamp=";
+        ResponseEntity<Map> exchange = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class,
+                "test", 1, 100);
     }
 }
