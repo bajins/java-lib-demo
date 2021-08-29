@@ -6,7 +6,9 @@ import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Map;
 
 
@@ -49,7 +51,12 @@ public class RestTemplateLearning {
 
 
         String url = "https://test.com/tags/{1}/test?page={2}&count={3}&order=new&before_timestamp=";
-        ResponseEntity<Map> exchange = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class,
-                "test", 1, 100);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers),
+                Map.class, "test", 1, 100);
+
+
+        URI uri = UriComponentsBuilder.fromHttpUrl("http://posturl").build(true).toUri();
+        RequestEntity<Void> accept = RequestEntity.get(uri).header("Accept", type.toString()).build();
+        ResponseEntity<Map> exchange1 = restTemplate.exchange(accept, Map.class);
     }
 }
