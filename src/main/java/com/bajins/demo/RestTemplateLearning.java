@@ -2,6 +2,7 @@ package com.bajins.demo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -50,13 +51,20 @@ public class RestTemplateLearning {
         String result = restTemplate.postForObject("http://posturl", formEntity, String.class);
 
 
-        String url = "https://test.com/tags/{1}/test?page={2}&count={3}&order=new&before_timestamp=";
-        ResponseEntity<Map> exchange = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers),
-                Map.class, "test", 1, 100);
+        //Type[] genericParameterTypes = thisMethod.getGenericParameterTypes(); // String url,Class<T> clazz
+        //Type[] actualTypeArguments = ((ParameterizedType) genericParameterTypes[1]).getActualTypeArguments(); // T
+        //Type ttype = actualTypeArguments[0]; // T.class
+        //ParameterizedTypeReference<T> objectParameterizedTypeReference = ParameterizedTypeReference.forType(ttype);
 
+        ParameterizedTypeReference<Map<String, Object>> parameterizedTypeReference =
+                new ParameterizedTypeReference<Map<String, Object>>() {
+                };
+        String url = "https://test.com/tags/{1}/test?page={2}&count={3}&order=new&before_timestamp=";
+        ResponseEntity<Map<String, Object>> exchange = restTemplate.exchange(url, HttpMethod.GET,
+                new HttpEntity<String>(headers), parameterizedTypeReference, "test", 1, 100);
 
         URI uri = UriComponentsBuilder.fromHttpUrl("http://posturl").build(true).toUri();
         RequestEntity<Void> accept = RequestEntity.get(uri).header("Accept", type.toString()).build();
-        ResponseEntity<Map> exchange1 = restTemplate.exchange(accept, Map.class);
+        ResponseEntity<Map<String, Object>> exchange1 = restTemplate.exchange(accept, parameterizedTypeReference);
     }
 }
