@@ -26,6 +26,8 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * http工具类
@@ -44,25 +46,82 @@ public class HttpUtil {
     }
 
     /**
-     * 获取本机MAC地址
+     * 判断是否为内网IP
      *
-     * @param
-     * @return void
+     * @param ip
+     * @return
      */
-    public static String getMAC() throws UnknownHostException, SocketException {
-        InetAddress address = InetAddress.getLocalHost();
-        NetworkInterface ni = NetworkInterface.getByInetAddress(address);
-        //ni.getInetAddresses().nextElement().getAddress();
-        byte[] mac = ni.getHardwareAddress();
-
-        String sMAC = null;
-        Formatter formatter = new Formatter();
-        for (int i = 0; i < mac.length; i++) {
-            sMAC = formatter.format(Locale.getDefault(), "%02X%s", mac[i], (i < mac.length - 1) ? "-" : "").toString();
-        }
-        return sMAC;
+    public static boolean isIntranetIp(String ip) {
+        /**
+         * 内网IP范围
+         * <pre>
+         * 10.0.0.0/8-------10.0.0.0~10.255.255.255（A类）
+         * 172.16.0.0/12----172.16.0.0~172.31.255.255（B类）
+         * 192.168.0.0/16---192.168.0.0~192.168.255.255（C类）
+         * </pre>
+         */
+        String reg = "^(192\\.168|172\\.(1[6-9]|2\\d|3[0,1]))(\\.(2[0-4]\\d|25[0-5]|[0,1]?\\d?\\d)){2}$"
+                + "|^10(\\.([2][0-4]\\d|25[0-5]|[0,1]?\\d?\\d)){3}$";
+        /*String reg = "(10|172|192|127)\\.([0-1][0-9]{0,2}|[2][0-5]{0,2}|[3-9][0-9]{0,1})\\.([0-1][0-9]{0,2}"
+                + "|[2][0-5]{0,2}|[3-9][0-9]{0,1})\\.([0-1][0-9]{0,2}|[2][0-5]{0,2}|[3-9][0-9]{0,1})";*/
+        Pattern p = Pattern.compile(reg);
+        Matcher matcher = p.matcher(ip);
+        return matcher.find(); // true：是内网IP
     }
 
+    /**
+     * 根据IP获取MAC
+     *
+     * @param ip
+     * @return
+     * @throws IOException
+     */
+    public static String getMacByIp(String ip) throws IOException {
+        if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) { // 获取本地MAC地址
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            NetworkInterface ni = NetworkInterface.getByInetAddress(inetAddress);
+            //ni.getInetAddresses().nextElement().getAddress();
+            byte[] mac = ni.getHardwareAddress();
+            /*String sMAC = null;
+            Formatter formatter = new Formatter();
+            for (int i = 0; i < mac.length; i++) {
+                sMAC = formatter.format(Locale.getDefault(), "%02X%s", mac[i], (i < mac.length - 1) ? "-" : "")
+                .toString();
+            }
+            return sMAC;*/
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < mac.length; i++) {
+                if (i != 0) {
+                    sb.append("-");
+                }
+                String s = Integer.toHexString(mac[i] & 0xFF); // 把byte转换为正整数
+                sb.append((s.length() == 1) ? (0 + s) : s);
+            }
+            return sb.toString().trim().toUpperCase();
+        }
+        String macAddress = "";
+        Runtime runtime = Runtime.getRuntime();
+        Process p;
+        String osName = System.getProperty("os.name");
+        if (osName.contains("Windows")) {
+            p = runtime.exec("nbtstat -A " + ip);
+        } else {
+            runtime.exec("ping " + ip + " -c 1");
+            p = runtime.exec("arp -a");
+        }
+        try (InputStream inputStream = p.getInputStream();
+             InputStreamReader isr = new InputStreamReader(inputStream);
+             BufferedReader br = new BufferedReader(isr)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                int index = line.indexOf("MAC Address = ");
+                if (index != -1) {
+                    macAddress = line.substring(index + "MAC Address = ".length()).trim().toUpperCase();
+                }
+            }
+        }
+        return macAddress;
+    }
 
     /**
      * 获取用户真实IP地址
@@ -96,13 +155,24 @@ public class HttpUtil {
             // X-Forwarded-For：Squid 服务代理 和 Nginx服务代理
             ipAddresses = request.getHeader("X-Forwarded-For");
         }
+        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
+            ipAddresses = request.getRemoteAddr();
+            if ("127.0.0.1".equals(ipAddresses) || "0:0:0:0:0:0:0:1".equals(ipAddresses)) {
+                InetAddress inetAddress = null;
+                try {
+                    inetAddress = InetAddress.getLocalHost(); // 根据网卡获取本地的IP地址
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                if (inetAddress != null) {
+                    ipAddresses = inetAddress.getHostAddress(); // 获取本机的IP地址
+                }
+            }
+        }
         // 有些网络通过多层代理，那么会获取到以逗号（,）分割的多个IP，第一个才是真实IP
         int index = ipAddresses.indexOf(",");
         if (index != -1) {
             ipAddresses = ipAddresses.substring(0, index);
-        }
-        if (StringUtils.isBlank(ipAddresses) || "unknown".equalsIgnoreCase(ipAddresses)) {
-            ipAddresses = request.getRemoteAddr();
         }
         return ipAddresses;
     }
@@ -118,7 +188,6 @@ public class HttpUtil {
         return getIpAddress(httpServletRequest);
     }
 
-
     /**
      * 获取HttpServletRequest
      *
@@ -126,9 +195,8 @@ public class HttpUtil {
      * @return javax.servlet.http.HttpServletRequest
      */
     public static HttpServletRequest getHttpServletRequest() {
-        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }
-
 
     /**
      * 请求返回内容
@@ -145,7 +213,6 @@ public class HttpUtil {
             out.flush();
         }
     }
-
 
     /**
      * 根据域获取上下文路径
@@ -168,11 +235,9 @@ public class HttpUtil {
     public static String getUrl() {
         StringBuffer url = getHttpServletRequest().getRequestURL();
         //获取域名
-        String tempContextUrl = url.delete(url.length() - getHttpServletRequest().getRequestURI().length(),
+        return url.delete(url.length() - getHttpServletRequest().getRequestURI().length(),
                 url.length()).append(getHttpServletRequest().getServletContext().getContextPath()).append("/").toString();
-        return tempContextUrl;
     }
-
 
     /**
      * 从InputStream中获取参数
@@ -236,7 +301,6 @@ public class HttpUtil {
         }
     }
 
-
     /**
      * 获取HttpServletRequest中的参数并封装到Map<String, Object>
      *
@@ -251,10 +315,10 @@ public class HttpUtil {
         for (Map.Entry<String, String[]> entry : properties.entrySet()) {
             String[] values = entry.getValue();
             StringBuilder value = new StringBuilder();
-            for (int i = 0; i < values.length; i++) { // 用于请求参数中有多个相同名称
-                value.append(values[i]).append(",");
+            for (String s : values) { // 用于请求参数中有多个相同名称
+                value.append(s).append(",");
             }
-            if (null != value && value.length() > 1) {
+            if (value.length() > 1) {
                 value.deleteCharAt(value.length() - 1);
             }
             returnMap.put(entry.getKey(), value.toString());
@@ -273,9 +337,7 @@ public class HttpUtil {
         // 获取HttpServletRequest中的参数map
         Map<String, String[]> properties = request.getParameterMap();
         Map<String, String> returnMap = new HashMap<>();
-        Iterator<Map.Entry<String, String[]>> iter = properties.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, String[]> entry = iter.next();
+        for (Map.Entry<String, String[]> entry : properties.entrySet()) {
             returnMap.put(entry.getKey(), String.join(",", entry.getValue()));
         }
         return returnMap;
@@ -326,9 +388,7 @@ public class HttpUtil {
         // 获取HttpServletRequest中的参数map
         Map<String, String[]> properties = request.getParameterMap();
         Map<String, String> returnMap = new HashMap<>();
-        Iterator<Map.Entry<String, String[]>> iter = properties.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, String[]> entry = iter.next();
+        for (Map.Entry<String, String[]> entry : properties.entrySet()) {
             returnMap.put(entry.getKey(), ArrayUtils.toString(entry.getValue(), ","));
         }
         return returnMap;
@@ -417,9 +477,7 @@ public class HttpUtil {
         Objects.requireNonNull(request);
         Map<String, Part> returnMap = new HashMap<>();
         Collection<Part> parts = request.getParts();
-        Iterator<Part> iterator = parts.iterator();
-        while (iterator.hasNext()) {
-            Part part = iterator.next();
+        for (Part part : parts) {
             String name = part.getName();
             returnMap.put(name, part);
         }
@@ -562,7 +620,7 @@ public class HttpUtil {
                 connection.setDoOutput(true);
                 // 通过输出流对象将参数写出去/传输出去,它是通过字节数组写出的
                 try (OutputStream outputStream = connection.getOutputStream()) {
-                    outputStream.write(param.getBytes("utf-8"));
+                    outputStream.write(param.getBytes(StandardCharsets.UTF_8));
                 }
             }
             // 发送请求

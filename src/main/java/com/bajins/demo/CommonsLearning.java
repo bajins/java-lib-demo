@@ -49,6 +49,7 @@ import java.util.*;
  *
  * @see PropertyUtils 和BeanUtils不同在于：运行getProperty、setProperty操作时，没有类型转换，使用属性的原有类型或者包装类
  * @see BeanUtils
+ * @see org.apache.commons.collections4
  */
 public class CommonsLearning {
 
@@ -95,7 +96,7 @@ public class CommonsLearning {
         intList.add(3);
         intList.add(4);
 
-        Collections.sort(intList, new BeanComparator("fieldName", mycmp));
+        intList.sort(new BeanComparator("fieldName", mycmp));
 
         // 将一个list按三个一组分成N个小的list，
         // 没有对应的Iterable.partions方法，类似guava那样，partition后的结果同样是原集合的视图

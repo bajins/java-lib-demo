@@ -3,6 +3,7 @@ package com.bajins.demo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -10,6 +11,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
@@ -25,6 +27,9 @@ import java.util.stream.Stream;
  * @see StringUtils 字符串工具类
  * @see Assert 断言工具类
  * @see ReflectionUtils 反射工具类
+ * @see AopProxyUtils
+ * @see AopUtils
+ * @see ClassUtils
  * <br/>
  * @see org.springframework.beans JavaBean相关操作
  * @see BeanUtils
@@ -69,6 +74,17 @@ import java.util.stream.Stream;
  * @see WebUtils
  * </br>
  * @see org.springframework.web.bind.ServletRequestUtils
+ * @see RequestContextHolder
+ * @see TransactionSynchronizationManager
+ * @see LocaleContextHolder
+ * @see ConfigurableListableBeanFactory Spring应用上下文环境
+ * @see ApplicationContext https://www.cnblogs.com/pijunqi/p/14131648.html
+ * @see WebApplicationContext
+ * @see WebApplicationContextUtils
+ * @see ApplicationContextAware
+ * @see ApplicationObjectSupport
+ * @see WebApplicationObjectSupport
+ * @see BeanFactoryPostProcessor
  */
 public class SpringUtilLearning {
 
@@ -137,5 +153,8 @@ public class SpringUtilLearning {
         // 二元组
         Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");
         System.out.println(of.getFirst());
+
+        /*WebApplicationContext wac = (WebApplicationContext)servletContext.getAttribute(
+                WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);*/
     }
 }

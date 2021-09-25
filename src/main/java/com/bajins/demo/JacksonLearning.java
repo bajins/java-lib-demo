@@ -115,7 +115,7 @@ public class JacksonLearning {
 
 
         // HashMap<String,String> 转json
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("name", "jack");
         map.put("city", "beijin");
         String mjson = objectMapper.writeValueAsString(map);
@@ -168,6 +168,18 @@ public class JacksonLearning {
 
     public static void main(String[] args) throws IOException {
         testJackJson();
+
+        /*JSONObject.toJSONString(request, new PropertyPreFilter() { // 序列化HttpServletRequest
+            @Override
+            public boolean apply(JSONSerializer paramJSONSerializer, Object paramObject, String paramString) {
+                List<String> names = new ArrayList<>();
+                names.add("asyncContext");
+                names.add("asyncStarted");
+                names.add("parts");
+                names.add("reader");
+                return !names.contains(paramString);
+            }
+        });*/
     }
 }
 
