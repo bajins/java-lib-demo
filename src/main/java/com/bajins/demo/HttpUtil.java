@@ -667,4 +667,18 @@ public class HttpUtil {
         HttpsURLConnection httpsURLConnection = request(httpUrl, "POST", param, null, null, null);
         return getStringParam(httpsURLConnection.getInputStream());
     }
+
+    public static void main(String[] args) {
+        /*String castgc = "ST-15648-q3eFzkMy3uOUfjJghvC6-cas01.example.org";
+        Map<String, String> map = new HashMap<>();
+        map.put("CASTGC", castgc);
+        map.put("url", url);
+        Connection.Response response = Jsoup.connect(url).cookie("CASTGC", castgc).data(map).
+                method(Connection.Method.POST).timeout(200000).execute();
+        Integer resultCode = response.statusCode();
+        if (resultCode == 200) {
+            Map<String, String> cookies = response.cookies();
+            System.out.println((String) cookies.get("sid"));
+        }*/
+    }
 }

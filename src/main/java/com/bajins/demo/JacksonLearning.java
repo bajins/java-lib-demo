@@ -169,7 +169,21 @@ public class JacksonLearning {
     public static void main(String[] args) throws IOException {
         testJackJson();
 
-        /*JSONObject.toJSONString(request, new PropertyPreFilter() { // 序列化HttpServletRequest
+        /*
+        // https://binarylife.icu/articles/1032
+        // SerializeFilterable 过滤器列表
+        // AfterFilter
+        // BeforeFilter
+        // ContextValueFilter
+        // LabelFilter
+        // NameFilter
+        // PascalNameFilter
+        // PropertyFilter
+        // PropertyPreFilter
+        // SerializeFilter
+        // SimplePropertyPreFilter
+        // ValueFilter
+        JSONObject.toJSONString(request, new PropertyPreFilter() { // 序列化HttpServletRequest
             @Override
             public boolean apply(JSONSerializer paramJSONSerializer, Object paramObject, String paramString) {
                 List<String> names = new ArrayList<>();
