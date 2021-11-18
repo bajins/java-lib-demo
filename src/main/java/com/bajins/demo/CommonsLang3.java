@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 /**
  * @see DurationFormatUtils
  * @see FastDateFormat
+ * @see ComparatorChain 多元素排序
+ * @see BeanComparator 实现自然排序（根据ASCII码排序）
+ * @see FixedOrderComparator 指定排序规则
  */
 public class CommonsLang3 {
 
@@ -256,7 +259,7 @@ public class CommonsLang3 {
         int i1 = StringUtils.countMatches("abba", "a");
 
 
-        /**
+        /*
          * org.apache.commons.lang3.tuple包下有：
          * <p>
          * Pair 封装一对键值对，实现类：可变 MutablePair<L,R>，不可变 ImmutablePair<L,R>
@@ -269,6 +272,11 @@ public class CommonsLang3 {
 
         ImmutableTriple<String, String, String> three = ImmutableTriple.of("1", "2", "3");
         System.out.println(three.left);
+
+        /*
+         * 动态根据字段排序
+         */
+        //Collections.<Student> sort(list, new BeanComparator<Student>("score"));
 
     }
 
