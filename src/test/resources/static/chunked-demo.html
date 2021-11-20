@@ -1,0 +1,55 @@
+<html lang="zh_CN">
+
+<head>
+    <title>分块响应</title>
+</head>
+
+<body>
+<div>
+    <h1>实时加载</h1>
+    <div id="divmessage">
+        <span id="message"></span>
+    </div>
+    <ul id="data">
+    </ul>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        const xhr = new $.ajaxSettings.xhr();
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/onreadystatechange
+        // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Transfer-Encoding
+        xhr.onreadystatechange = function () { // 利用了Transfer-Encoding: chunked 分块传输
+            if (xhr.readyState === XMLHttpRequest.UNSENT) { // 构造对象，new XMLHttpRequest()时
+
+            } else if (xhr.readyState === XMLHttpRequest.OPENED) { // 打开，调用open方法时，可调用setRequestHeader()
+
+            } else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED) { // 重定向
+
+            } else if (xhr.readyState === XMLHttpRequest.LOADING) { // 传输中
+                console.log(3, xhr.response);
+                $("#message").html("加载中…… 【" + xhr.responseText.length + "】");
+                $("#data").append('<li>' + xhr.responseText + "</li>");
+            } else if (xhr.readyState === XMLHttpRequest.DONE) { // 分块数据传输完成
+                console.log(4, xhr.responseText);
+                $("#message").html("加载完成，共" + xhr.responseText.length + "条记录")
+            }
+        }
+        let last_index = 0;
+        xhr.onprogress = function () { // 传输中
+            console.log("qqq", xhr.responseText)
+            const curr_index = xhr.responseText.length;
+            if (last_index === curr_index) return;
+            const s = xhr.responseText.substring(last_index, curr_index);
+            last_index = curr_index;
+            console.log("PROGRESS:", s);
+        };
+        // xhr.open('GET', 'http://127.0.0.1:8080/app/testCallable')
+        xhr.open('GET', 'http://127.0.0.1:8080/app/test')
+        xhr.send()
+    });
+</script>
+
+</body>
+
+</html>
