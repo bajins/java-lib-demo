@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * apache HttpComponents
+ * apache HttpComponents https://github.com/apache?q=httpcomponents
  * 需要包httpmime
  *
  * @author Administrator
