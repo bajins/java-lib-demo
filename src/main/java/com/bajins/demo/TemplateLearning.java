@@ -191,5 +191,25 @@ public class TemplateLearning {
         Map<String, Object> map = new HashMap<>();
         map.put("date", new Date());
         System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}", map));
+
+
+        /*
+        List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql, new Object[]{id}); // 字段为下划线大写风格
+        List<Map<String, Object>> mapList = jdbcTemplate.query(sql, new Object[]{id},
+            new RowMapper<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    int columnCount = rsmd.getColumnCount();
+                    Map<String, Object> mapOfColValues = new LinkedCaseInsensitiveMap<Object>(columnCount);
+                    for (int i = 1; i <= columnCount; i++) {
+                        String key = JdbcUtils.lookupColumnName(rsmd, i);
+                        key = JdbcUtils.convertUnderscoreNameToPropertyName(key); // 下划线转驼峰
+                        Object obj = JdbcUtils.getResultSetValue(rs, i);
+                        mapOfColValues.put(key, obj);
+                    }
+                    return mapOfColValues;
+                }
+            });*/
     }
 }
