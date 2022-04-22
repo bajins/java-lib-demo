@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -76,7 +77,7 @@ public class ChunkedController {
     @ResponseBody
     public String test(HttpServletResponse response) {
         response.setContentType("text/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         System.out.println(response.getLocale());
         //response.setLocale(Locale.CHINA);
         System.out.println(response.getBufferSize());

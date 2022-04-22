@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Apache POI SXSS相关API的简易封装
@@ -75,7 +76,7 @@ public class POIUtils {
                 // response对象不为空,响应到浏览器下载
                 response.setContentType(XLSX_CONTENT_TYPE);
                 response.setHeader("Content-disposition", "attachment; filename="
-                        + URLEncoder.encode(String.format("%s%s", fileName, XLSX_SUFFIX), "UTF-8"));
+                        + URLEncoder.encode(String.format("%s%s", fileName, XLSX_SUFFIX), StandardCharsets.UTF_8.name()));
                 if (out == null) {
                     out = response.getOutputStream();
                 }

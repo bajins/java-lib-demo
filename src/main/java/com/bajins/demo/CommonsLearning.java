@@ -18,6 +18,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -108,13 +109,15 @@ public class CommonsLearning {
 
             // 设置编码，此处的实际是个PropertiesConfiguration，它默认采用的是`ISO-8859-1`所以中文乱码~
             // 注意：这个前提是你的properties文件是utf-8编码的~~~
-            FileBasedConfigurationBuilder.setDefaultEncoding(PropertiesConfiguration.class, "UTF-8");
+            FileBasedConfigurationBuilder.setDefaultEncoding(PropertiesConfiguration.class,
+                    StandardCharsets.UTF_8.name());
             // 每个Configuration代表这一个配置文件~（依赖beanutils这个jar）
             Configuration config = configs.properties("my.properties");
 
             // 采用Builder模式处理更为复杂的一些场景   比如把逗号分隔的字符串解析到数组、解析到list、前后拼接字符串等等操作
             // 其实你直接configs.properties(...)它的内部原理也是builder模式~
-            /*FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs.propertiesBuilder("my.properties");
+            /*FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configs.propertiesBuilder("my
+            .properties");
             builder.addEventListener();
             builder.getConfiguration();
             builder.getFileHandler();*/

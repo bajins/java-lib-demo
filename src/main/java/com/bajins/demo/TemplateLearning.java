@@ -11,6 +11,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.jdbc.datasource.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -30,9 +31,17 @@ import java.util.regex.Pattern;
  * @see Template
  * @see StringTemplateLoader
  * @see RestTemplate
- * @see org.springframework.jdbc.core.JdbcTemplate
- * @see org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+ * @see org.springframework.jdbc.core.JdbcTemplate SQL中使用（?）占位符
+ * @see org.springframework.jdbc.core.SimpleJdbcTemplate SQL中使用（?）占位符
+ * @see org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate SQL中使用命名参数（:name）
  * @see HIbernateTemplate
+ * @see DataSourceUtils
+ * @see SmartDataSource
+ * @see AbstractDataSource
+ * @see SingleConnectionDataSource
+ * @see DriverManagerDataSource
+ * @see TransactionAwareDataSourceProxy
+ * @see DataSourceTransactionManager
  */
 public class TemplateLearning {
 
@@ -147,16 +156,14 @@ public class TemplateLearning {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("shopid", "1");
 
-        HttpEntity<MultiValueMap<String, String>> multiValueMapHttpEntity = new HttpEntity<>(map, headers);
-
         ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity("http://posturl",
-                multiValueMapHttpEntity, String.class);
+                new HttpEntity<>(map, headers), String.class);
         if (stringResponseEntity.getStatusCode() != HttpStatus.OK) { // 请求异常
             return;
         }
         System.out.println(stringResponseEntity);
 
-        // json
+        // JSON
         MediaType type = MediaType.parseMediaType(MediaType.APPLICATION_JSON_VALUE + "; charset=UTF-8");
         headers.setContentType(type);
         //headers.setAccept(Collections.singletonList(type));
@@ -165,10 +172,7 @@ public class TemplateLearning {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String s = objectMapper.writeValueAsString(map);
-        HttpEntity<String> formEntity = new HttpEntity<>(s, headers);
-
-        String result = restTemplate.postForObject("http://posturl", formEntity, String.class);
-
+        String result = restTemplate.postForObject("http://posturl", new HttpEntity<>(s, headers), String.class);
 
         //Type[] genericParameterTypes = thisMethod.getGenericParameterTypes(); // String url,Class<T> clazz
         //Type[] actualTypeArguments = ((ParameterizedType) genericParameterTypes[1]).getActualTypeArguments(); // T
@@ -178,6 +182,9 @@ public class TemplateLearning {
         ParameterizedTypeReference<Map<String, Object>> parameterizedTypeReference =
                 new ParameterizedTypeReference<Map<String, Object>>() {
                 };
+        /*
+         * GET请求
+         */
         String url = "https://test.com/tags/{1}/test?page={2}&count={3}&order=new&before_timestamp=";
         ResponseEntity<Map<String, Object>> exchange = restTemplate.exchange(url, HttpMethod.GET,
                 new HttpEntity<String>(headers), parameterizedTypeReference, "test", 1, 100);
@@ -187,14 +194,20 @@ public class TemplateLearning {
         ResponseEntity<Map<String, Object>> exchange1 = restTemplate.exchange(accept, parameterizedTypeReference);
     }
 
-    public static void main(String[] args) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("date", new Date());
-        System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}", map));
 
-
+    /**
+     * RowMapper：用于将结果集每行数据转换为需要的类型，用户需实现方法mapRow(ResultSet rs, int rowNum)来完成将每行数据转换为相应的类型。
+     * BeanPropertyRowMapper
+     * ParameterizedBeanPropertyRowMapper
+     * ColumnMapRowMapper
+     * SingleColumnRowMapper
+     * RowCallbackHandler：用于处理ResultSet的每一行结果，用户需实现方法processRow(ResultSet rs)来完成处理，
+     * 在该回调方法中无需执行rs.next()，该操作由JdbcTemplate来执行，用户只需按行获取数据然后处理即可。
+     * ResultSetExtractor：用于结果集数据提取，用户需实现方法extractData(ResultSet rs)来处理结果集，用户必须处理整个结果集。
+     */
+    public void jdbcTemplate() {
+        //List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql, new Object[]{id}); // 字段为下划线大写风格
         /*
-        List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql, new Object[]{id}); // 字段为下划线大写风格
         List<Map<String, Object>> mapList = jdbcTemplate.query(sql, new Object[]{id},
             new RowMapper<Map<String, Object>>() {
                 @Override
@@ -211,5 +224,12 @@ public class TemplateLearning {
                     return mapOfColValues;
                 }
             });*/
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("date", new Date());
+        System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}",
+                map));
     }
 }

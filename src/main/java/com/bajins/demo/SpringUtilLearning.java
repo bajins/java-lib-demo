@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
@@ -85,6 +86,17 @@ import java.util.stream.Stream;
  * @see ApplicationObjectSupport
  * @see WebApplicationObjectSupport
  * @see BeanFactoryPostProcessor
+ * </br> Interceptor拦截器，基于Java的反射机制（动态代理）实现
+ * @see HandlerInterceptor 请求地址拦截器
+ * @see AsyncHandlerInterceptor
+ * @see HandlerExceptionResolver
+ * @see MethodInterceptor AOP项目中方法拦截器
+ * @see LocaleChangeInterceptor
+ * @see ThemeChangeInterceptor
+ * @see RequestBodyAdvice
+ * @see ResponseBodyAdvice
+ * </br> Filter过滤器，基于函数回调
+ * @see Filter 过滤器
  */
 public class SpringUtilLearning {
 

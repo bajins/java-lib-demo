@@ -4,6 +4,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * org.apache.commons.commons-io
@@ -110,5 +112,29 @@ public class CommonsIO {
         //FileUtils.moveFileToDirectory();
         //FileUtils.moveToDirectory();
         //FileUtils.isSymlink();
+    }
+
+    /**
+     * 修改文件内容：字符串逐行替换
+     *
+     * @param file：待处理的文件
+     * @param oldStr：需要替换的旧字符串
+     * @param newStr：用于替换的新字符串
+     */
+    public static boolean modifyFileContent(File file, String oldStr, String newStr) {
+        try {
+            List<String> list = FileUtils.readLines(file, StandardCharsets.UTF_8);
+            for (int i = 0; i < list.size(); i++) {
+                String str = list.get(i);
+                if (str.contains(oldStr)) {
+                    list.remove(i);
+                    list.add(i,str.replaceAll(oldStr, newStr));
+                }
+            }
+            FileUtils.writeLines(file, StandardCharsets.UTF_8.name(), list, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
