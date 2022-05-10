@@ -6,20 +6,47 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.jdbc.datasource.*;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.net.ssl.*;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +62,7 @@ import java.util.regex.Pattern;
  * @see org.springframework.jdbc.core.SimpleJdbcTemplate SQL中使用（?）占位符
  * @see org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate SQL中使用命名参数（:name）
  * @see HIbernateTemplate
+ * @see TransactionTemplate
  * @see DataSourceUtils
  * @see SmartDataSource
  * @see AbstractDataSource
@@ -148,7 +176,13 @@ public class TemplateLearning {
      */
     public static void restTemplate() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
-
+        //restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(Charset.forName("GBK")));
+        restTemplate.getMessageConverters().forEach(httpMessageConverter -> { // 请求设置编码
+            if (httpMessageConverter instanceof StringHttpMessageConverter) {
+                StringHttpMessageConverter messageConverter = (StringHttpMessageConverter) httpMessageConverter;
+                messageConverter.setDefaultCharset(StandardCharsets.UTF_8); // 编码格式
+            }
+        });
         HttpHeaders headers = new HttpHeaders();
         // 表单
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -194,6 +228,198 @@ public class TemplateLearning {
         ResponseEntity<Map<String, Object>> exchange1 = restTemplate.exchange(accept, parameterizedTypeReference);
     }
 
+    /**
+     * 支持HTTP、HTTPS 方式一
+     *
+     * @return
+     */
+    public RestTemplate restTemplate1() {
+        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create().register("http"
+                        , PlainConnectionSocketFactory.getSocketFactory()).register("https",
+                        SSLConnectionSocketFactory.getSocketFactory())//
+                .build();
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
+        connectionManager.setMaxTotal(200);
+        connectionManager.setDefaultMaxPerRoute(100);
+        connectionManager.setValidateAfterInactivity(2000);
+        RequestConfig requestConfig = RequestConfig.custom()
+                // 服务器返回数据(response)的时间，超时抛出read timeout
+                .setSocketTimeout(65000)
+                // 连接上服务器(握手成功)的时间，超时抛出connect timeout
+                .setConnectTimeout(5000)
+                // 从连接池中获取连接的超时时间，超时抛出ConnectionPoolTimeoutException
+                .setConnectionRequestTimeout(1000)//
+                .build();
+        CloseableHttpClient closeableHttpClient = HttpClientBuilder.create()//
+                .setDefaultRequestConfig(requestConfig)//
+                .setConnectionManager(connectionManager)//
+                .build();
+        ClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(closeableHttpClient);
+        return new RestTemplate(requestFactory);
+    }
+
+    /**
+     * 支持HTTP、HTTPS 方式二
+     *
+     * @return
+     */
+    public RestTemplate restTemplate2() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        //TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+        TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        /*KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        SSLContext ctx = SSLContexts.custom().loadTrustMaterial(trustStore, acceptingTrustStrategy).build();*/
+        /*SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+            @Override
+            public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                return true;
+            }
+        }).build();*/
+
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+        /*SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, new String[]{"TLSv1"}, null,
+                NoopHostnameVerifier.INSTANCE);*/
+
+        /*Registry<ConnectionSocketFactory> sfr = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                .register("https", csf != null ? csf : SSLConnectionSocketFactory.getSocketFactory())//
+                .build();
+        PoolingHttpClientConnectionManager pollingConnectionManager = new PoolingHttpClientConnectionManager(sfr);
+        // pollingConnectionManager.setMaxTotal(maxTotal);
+        // pollingConnectionManager.setDefaultMaxPerRoute(perRoute);
+
+        CloseableHttpClient httpClient = HttpClients.custom()//
+                        .setSSLSocketFactory(csf)//
+                        .setConnectionManager(pollingConnectionManager)//
+                        .build();*/
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+        requestFactory.setConnectTimeout(5000);
+        requestFactory.setReadTimeout(6000);
+        requestFactory.setConnectionRequestTimeout(60000);
+
+        return new RestTemplate(requestFactory);
+    }
+
+    /**
+     * 声明:此代码摘录自https://blog.csdn.net/wltsysterm/article/details/80977455
+     */
+    public class HttpsClientRequestFactory extends SimpleClientHttpRequestFactory {
+
+        @Override
+        protected void prepareConnection(HttpURLConnection connection, String httpMethod) {
+            try {
+                if (!(connection instanceof HttpsURLConnection)) {
+                    throw new RuntimeException("An instance of HttpsURLConnection is expected");
+                }
+
+                HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
+
+                TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    }
+                }};
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                httpsConnection.setSSLSocketFactory(new MyCustomSSLSocketFactory(sslContext.getSocketFactory()));
+
+                httpsConnection.setHostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String s, SSLSession sslSession) {
+                        return true;
+                    }
+                });
+
+                super.prepareConnection(httpsConnection, httpMethod);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * We need to invoke sslSocket.setEnabledProtocols(new String[] {"SSLv3"});
+         * see http://www.oracle.com/technetwork/java/javase/documentation/cve-2014-3566-2342133.html (Java 8 section)
+         * SSLSocketFactory用于创建 SSLSockets
+         */
+        private class MyCustomSSLSocketFactory extends SSLSocketFactory {
+
+            private final SSLSocketFactory delegate;
+
+            public MyCustomSSLSocketFactory(SSLSocketFactory delegate) {
+                this.delegate = delegate;
+            }
+
+            // 返回默认启用的密码套件。除非一个列表启用，对SSL连接的握手会使用这些密码套件。
+            // 这些默认的服务的最低质量要求保密保护和服务器身份验证
+            @Override
+            public String[] getDefaultCipherSuites() {
+                return delegate.getDefaultCipherSuites();
+            }
+
+            // 返回的密码套件可用于SSL连接启用的名字
+            @Override
+            public String[] getSupportedCipherSuites() {
+                return delegate.getSupportedCipherSuites();
+            }
+
+
+            @Override
+            public Socket createSocket(final Socket socket, final String host, final int port,
+                                       final boolean autoClose) throws IOException {
+                final Socket underlyingSocket = delegate.createSocket(socket, host, port, autoClose);
+                return overrideProtocol(underlyingSocket);
+            }
+
+
+            @Override
+            public Socket createSocket(final String host, final int port) throws IOException {
+                final Socket underlyingSocket = delegate.createSocket(host, port);
+                return overrideProtocol(underlyingSocket);
+            }
+
+            @Override
+            public Socket createSocket(final String host, final int port, final InetAddress localAddress,
+                                       final int localPort) throws IOException {
+                final Socket underlyingSocket = delegate.createSocket(host, port, localAddress, localPort);
+                return overrideProtocol(underlyingSocket);
+            }
+
+            @Override
+            public Socket createSocket(final InetAddress host, final int port) throws IOException {
+                final Socket underlyingSocket = delegate.createSocket(host, port);
+                return overrideProtocol(underlyingSocket);
+            }
+
+            @Override
+            public Socket createSocket(final InetAddress host, final int port, final InetAddress localAddress,
+                                       final int localPort) throws IOException {
+                final Socket underlyingSocket = delegate.createSocket(host, port, localAddress, localPort);
+                return overrideProtocol(underlyingSocket);
+            }
+
+            private Socket overrideProtocol(final Socket socket) {
+                if (!(socket instanceof SSLSocket)) {
+                    throw new RuntimeException("An instance of SSLSocket is expected");
+                }
+                ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1"});
+                return socket;
+            }
+        }
+    }
+
 
     /**
      * RowMapper：用于将结果集每行数据转换为需要的类型，用户需实现方法mapRow(ResultSet rs, int rowNum)来完成将每行数据转换为相应的类型。
@@ -229,7 +455,6 @@ public class TemplateLearning {
     public static void main(String[] args) {
         Map<String, Object> map = new HashMap<>();
         map.put("date", new Date());
-        System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}",
-                map));
+        System.out.println(processFreemarker("<#setting locale=\"zh_CN\">${date?string('yyyy-MM-dd HH:mm:ss')}", map));
     }
 }

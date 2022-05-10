@@ -171,6 +171,8 @@ public class JacksonLearning {
 
         /*
         // https://binarylife.icu/articles/1032
+        // Feature.DisableFieldSmartMatch 用于关闭下划线、大小写
+        // PropertyNamingStrategy https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn
         // SerializeFilterable 过滤器列表
         // AfterFilter
         // BeforeFilter
