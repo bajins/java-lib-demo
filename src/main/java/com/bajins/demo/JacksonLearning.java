@@ -6,12 +6,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.google.common.base.CaseFormat;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -142,11 +145,21 @@ public class JacksonLearning {
         // List<Map<String, String>> 转json
         List<Map<String, String>> list = new ArrayList<>();
         list.add(map);
+        SerializerProvider serializerProvider = objectMapper.getSerializerProvider();
+        serializerProvider.setDefaultKeySerializer(new JsonSerializer<Object>() {// 处理属性名称，特别是Map的KEY是下划线风格时
+            @Override
+            public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+                    throws IOException {
+                String id = (String) o;
+                String to = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, id);
+                jsonGenerator.writeFieldName(to);
+            }
+        });
         String ljson = objectMapper.writeValueAsString(list);
         System.out.println(ljson);
 
         // json转 转换为 ArrayList<Map<String,Object>>
-        ArrayList<Map<String, Object>> lm = objectMapper.readValue(ljson, ArrayList.class);
+        List<Map<String, Object>> lm = objectMapper.readValue(ljson, ArrayList.class);
         System.out.println(lm);
 
         // 转换为 ArrayList<Map<String,Object>>
@@ -197,53 +210,50 @@ public class JacksonLearning {
             }
         });*/
     }
-}
 
-
-/**
- * 自定义命名策略，为字段添加下划线前缀，其中setter方法使用默认的字段名
- */
-/*
-public static class AppendPrefixStrategyForSetter extends PropertyNamingStrategy.PropertyNamingStrategyBase {
-    @Override
-    public String translate(String input) {
-        return '_' + input;
-    }
-
-    @Override
-    public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-        return defaultName;
-    }
-}*/
-
-
-/**
- * 出参保留两位小数
- *
- * @JsonDeserialize(using = DeserializerBigDecimal.class)
- */
-class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
-    @Override
-    public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        String value = jsonParser.getValueAsString();
-        if (!StringUtils.hasText(value)) {
-            return null;
+    /**
+     * 自定义命名策略，为字段添加下划线前缀，其中setter方法使用默认的字段名
+     */
+    public static class AppendPrefixStrategyForSetter extends PropertyNamingStrategy.PropertyNamingStrategyBase {
+        @Override
+        public String translate(String input) {
+            return '_' + input;
         }
-        // 这里取floor
-        return new BigDecimal(value).setScale(2, RoundingMode.FLOOR);
+
+        @Override
+        public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
+            return defaultName;
+        }
     }
-}
 
+    /**
+     * 出参保留两位小数
+     *
+     * @JsonDeserialize(using = DeserializerBigDecimal.class)
+     */
+    public static class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
+        @Override
+        public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            String value = jsonParser.getValueAsString();
+            if (!StringUtils.hasText(value)) {
+                return null;
+            }
+            // 这里取floor
+            return new BigDecimal(value).setScale(2, RoundingMode.FLOOR);
+        }
+    }
 
-/**
- * 入参保留两位小数
- *
- * @JsonSerialize(using = SerializerBigDecimal.class)
- */
-class SerializerBigDecimal extends JsonSerializer<BigDecimal> {
-    @Override
-    public void serialize(BigDecimal bigDecimal, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        // 注意这里不能使用jsonGenerator.writeNumber(result);方法，不然会把.00去掉
-        jsonGenerator.writeString(bigDecimal.setScale(2, RoundingMode.FLOOR).toPlainString());
+    /**
+     * 入参保留两位小数
+     *
+     * @JsonSerialize(using = SerializerBigDecimal.class)
+     */
+    public static class SerializerBigDecimal extends JsonSerializer<BigDecimal> {
+        @Override
+        public void serialize(BigDecimal bigDecimal, JsonGenerator jsonGenerator,
+                              SerializerProvider serializerProvider) throws IOException {
+            // 注意这里不能使用jsonGenerator.writeNumber(result);方法，不然会把.00去掉
+            jsonGenerator.writeString(bigDecimal.setScale(2, RoundingMode.FLOOR).toPlainString());
+        }
     }
 }
