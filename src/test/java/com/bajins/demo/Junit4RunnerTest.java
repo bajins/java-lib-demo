@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 @SpringBootTest
 //@RunWith(SpringRunner.class)
 //@RunWith(SpringJUnit4ClassRunner.class)
-@RunWith(JUnitRunner.class)
+@RunWith(JUnit4Runner.class)
 //@AutoConfigureMockMvc
 @WebAppConfiguration
 @ContextConfiguration(locations = {
@@ -23,7 +23,7 @@ import javax.sql.DataSource;
         /*"file:WebContent/META-INF/datasource-test.xml"*/
 })
 //@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public class DemoTest extends AbstractTransactionalJUnit4SpringContextTests {
+public class Junit4RunnerTest extends AbstractTransactionalJUnit4SpringContextTests {
 
 
     @Before

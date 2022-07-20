@@ -32,7 +32,7 @@
                 $("#data").append('<li>' + xhr.responseText + "</li>");
             } else if (xhr.readyState === XMLHttpRequest.DONE) { // 分块数据传输完成
                 console.log(4, xhr.responseText);
-                $("#message").html("加载完成，共" + xhr.responseText.length + "条记录")
+                $("#message").html("加载完成，共" + xhr.responseText.length + "条记录");
             }
         }
         let last_index = 0;
@@ -44,9 +44,9 @@
             last_index = curr_index;
             console.log("PROGRESS:", s);
         };
-        // xhr.open('GET', 'http://127.0.0.1:8080/app/testCallable')
-        xhr.open('GET', 'http://127.0.0.1:8080/app/test')
-        xhr.send()
+        // xhr.open('GET', 'http://127.0.0.1:8080/app/testCallable');
+        xhr.open('GET', 'http://127.0.0.1:8080/app/test');
+        xhr.send();
     });
 </script>
 

@@ -572,6 +572,7 @@ public class HttpUtil {
 
     /**
      * 请求url并返回请求实体
+     * <a href="https://blog.csdn.net/wltsysterm/article/details/80977455">http https 原生实现</a>
      *
      * @param httpUrl
      * @param method

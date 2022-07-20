@@ -40,7 +40,7 @@ import java.util.List;
  * @see org.apache.ibatis.builder.xml.XMLMapperEntityResolver mybatis默认解析类
  */
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class JUnitRunner extends SpringJUnit4ClassRunner {
+public class JUnit4Runner extends SpringJUnit4ClassRunner {
 
     /*@Resource
     private DataSource dataSource;*/
@@ -127,7 +127,7 @@ public class JUnitRunner extends SpringJUnit4ClassRunner {
      * @param clazz
      * @throws Exception
      */
-    public JUnitRunner(Class<?> clazz) throws Exception {
+    public JUnit4Runner(Class<?> clazz) throws Exception {
         super(clazz);
 
         /**
