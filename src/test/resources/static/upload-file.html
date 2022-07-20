@@ -1,0 +1,75 @@
+<html lang="zh_CN">
+
+<head>
+    <title>上传文件</title>
+</head>
+
+<body>
+<div>
+    <h1>上传文件</h1>
+    <button type="button" class="next-btn next-medium next-btn-primary" role="button">
+        扫描文件
+        <label style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: inline-block;
+        cursor: pointer; background: rgb(255, 255, 255); overflow: hidden; opacity: 0;">
+        <input type="file" class="form-control"
+               style="position: absolute; clip: rect(1px, 1px, 1px, 1px);" id="files" min="1"
+               multiple="multiple" accept="*.*" readonly="readonly"/>
+        </label>
+    </button>
+    <input type="file" id="folder" webkitdirectory/>
+    <ul id="listing"></ul>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/File_API/Using_files_from_web_applications
+        // https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input/file
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/File_and_Directory_Entries_API
+        document.getElementById("files").addEventListener("change", function (event) {
+            const output = document.getElementById("listing");
+            const files = event.target.files;
+
+            // https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
+            const formData = new FormData();
+            // 所有字段都append进去
+            formData.append('id', "id"); // 参数只接受字符串或文件，后端取值时不能自动转换为对象
+            for (let i = 0; i < files.length; i++) {
+                let item = document.createElement("li");
+                item.innerHTML = files[i].webkitRelativePath;
+                output.appendChild(item);
+                // https://www.cnblogs.com/goloving/p/15272036.html
+                formData.append('file', files[i]); // 多个文件向同一个key中赋值会变成列表，且用getAll获取所有值
+                // formData.append('file', files[i], i); // 第三个参数为文件名称，如果不填则取真实文件名
+            }
+            console.log(formData.getAll("file"));
+            console.log(formData.get("id"));
+            console.log($("#files")[0].files);
+            console.log($("#folder")[0].files);
+            // 样式 https://www.cnblogs.com/hamsterPP/p/5804512.html
+            // 分割上传 https://blog.csdn.net/oYuLian/article/details/89241617
+            // https://www.cnblogs.com/yuerdong/p/9792443.html
+            // 多线程 https://blog.csdn.net/weixin_43822787/article/details/120842255
+            // https://blog.csdn.net/mah666/article/details/117170307
+            // 读取ZIP https://blog.csdn.net/lqlqlq007/article/details/121242545
+            // https://blog.csdn.net/weixin_42448623/article/details/107845783
+            // https://stuk.github.io/jszip/documentation/howto/read_zip.html
+            /*$.ajax({
+                url: 'XXXX ',
+                data: formData,
+                dataType: "json",
+                type: "POST",
+                cache: false, // 上传文件无需缓存
+                processData: false, // 用于对data参数进行序列化处理 这里必须false
+                contentType: false, // 告诉jquery不要设置content-Type请求头
+                success: function (res: any) {
+                },
+                error: function (err: any) {
+                }
+            });*/
+        }, false);
+    });
+</script>
+
+</body>
+
+</html>
