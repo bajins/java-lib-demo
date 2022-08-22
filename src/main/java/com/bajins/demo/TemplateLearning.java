@@ -70,6 +70,8 @@ import java.util.regex.Pattern;
  * @see DriverManagerDataSource
  * @see TransactionAwareDataSourceProxy
  * @see DataSourceTransactionManager
+ * @see MultiValueMap
+ * @see LinkedMultiValueMap
  */
 public class TemplateLearning {
 
@@ -189,6 +191,9 @@ public class TemplateLearning {
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("shopid", "1");
+        /*MultiValueMap<String, FileSystemResource> multiValueMap = new LinkedMultiValueMap();
+        FileSystemResource fsr = new FileSystemResource(new File("")); // 上传文件
+        multiValueMap.add("file",fsr);*/
 
         ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity("http://posturl",
                 new HttpEntity<>(map, headers), String.class);
@@ -450,6 +455,42 @@ public class TemplateLearning {
                     return mapOfColValues;
                 }
             });*/
+
+        /*List<TestDto> testDtos = jdbcTemplate.query(mlSql, new Object[] { id },
+                BeanPropertyRowMapper.newInstance(TestDto.class));*/
+        // sql求和
+        /*BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<BigDecimal>() {
+            @Override
+            public BigDecimal extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (!rs.next()) {
+                    return BigDecimal.ZERO;
+                }
+                BigDecimal bigDecimal = rs.getBigDecimal(1);
+                return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
+            }
+        });*/
+        /*BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, (rs) -> {
+            if (!rs.next()) {
+                return BigDecimal.ZERO;
+            }
+            BigDecimal bigDecimal = rs.getBigDecimal(1);
+            return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
+        });*/
+        /*List<TestDto> query = jdbcTemplate.query(mlSql, new Object[] { moId }, new RowMapper<TestDto>() {
+            @Override
+            public TestDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+                if (!rs.next()) {
+                    return null;
+                }
+                BigDecimal qty = rs.getBigDecimal("qty") != null ? rs.getBigDecimal("qty")
+                        : BigDecimal.ZERO;
+                TestDto testDto = new TestDto();
+                testDto.setId(rs.getString("id"));
+                testDto.setQty(qty);
+                return testDto;
+                // return DBUtil.getRecord(rs, TestDto.class);
+            }
+        });*/
     }
 
     public static void main(String[] args) {
