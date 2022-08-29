@@ -435,6 +435,8 @@ public class TemplateLearning {
      * RowCallbackHandler：用于处理ResultSet的每一行结果，用户需实现方法processRow(ResultSet rs)来完成处理，
      * 在该回调方法中无需执行rs.next()，该操作由JdbcTemplate来执行，用户只需按行获取数据然后处理即可。
      * ResultSetExtractor：用于结果集数据提取，用户需实现方法extractData(ResultSet rs)来处理结果集，用户必须处理整个结果集。
+     * PreparedStatement
+     * BatchPreparedStatementSetter
      */
     public void jdbcTemplate() {
         //List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql, new Object[]{id}); // 字段为下划线大写风格
@@ -491,6 +493,40 @@ public class TemplateLearning {
                 // return DBUtil.getRecord(rs, TestDto.class);
             }
         });*/
+
+        /*
+        // https://blog.csdn.net/qq_38737586/article/details/110595655
+        jdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() { // 小批量插入或更新数据（批量执行多条SQL）
+            public int getBatchSize() { // 返回批次的大小
+                return list.size();
+            }
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                // i：在这个批次中，正在执行操作的索引，从0算起
+                Map<?, ?> obj = (Map<?, ?>)list.get(i);
+                if(obj == null){
+                    return;
+                }
+                ps.setString(1,Z); // 参数填充从1开始
+                ps.setString(2, X);
+                ps.setString(3, B);
+                ps.setString(4, obj.get("O") == null ? "" : obj.get("O").toString());
+                ps.setString(5, N);
+            }
+        });
+        // 大批量插入或更新数据（批量执行多条SQL）
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        BatchSqlUpdate bsu = new BatchSqlUpdate(dataSource, "insert into user(name,number) values (?,?)");
+        bsu.setBatchSize(1000);
+        bsu.setTypes(new int[]{Types.VARCHAR, Types.VARCHAR});
+
+        for (User user : users) {
+            if(user == null){
+                continue;
+            }
+            bsu.update(new Object[]{user.getName(), user.getName()});
+        }
+        bsu.flush();
+        */
     }
 
     public static void main(String[] args) {
