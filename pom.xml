@@ -228,6 +228,7 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
         </dependency>
 
         <dependency>
@@ -254,6 +255,11 @@
             <artifactId>javase</artifactId>
             <version>3.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.83</version>
+        </dependency>
 
         <!-- Java 8 之前版本的默认时间替代api依赖 -->
         <dependency>
@@ -261,7 +267,11 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>4.2.0</version>
+        </dependency>
         <!-- 腾讯云对象存储 -->
         <dependency>
             <groupId>com.qcloud</groupId>
