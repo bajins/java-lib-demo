@@ -15,8 +15,11 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -47,6 +50,7 @@ import java.util.*;
  * org.apache.tomcat.embed:tomcat-embed-el
  * org.apache.tomcat.embed:tomcat-embed-websocket
  * org.apache.xmlbeans:xmlbeans
+ * org.apache.commons.commons-io
  *
  * @see PropertyUtils 和BeanUtils不同在于：运行getProperty、setProperty操作时，没有类型转换，使用属性的原有类型或者包装类
  * @see BeanUtils
@@ -54,6 +58,29 @@ import java.util.*;
  */
 public class CommonsLearning {
 
+    /**
+     * 修改文件内容：字符串逐行替换
+     *
+     * @param file：待处理的文件
+     * @param oldStr：需要替换的旧字符串
+     * @param newStr：用于替换的新字符串
+     */
+    public static boolean modifyFileContent(File file, String oldStr, String newStr) {
+        try {
+            List<String> list = FileUtils.readLines(file, StandardCharsets.UTF_8);
+            for (int i = 0; i < list.size(); i++) {
+                String str = list.get(i);
+                if (str.contains(oldStr)) {
+                    list.remove(i);
+                    list.add(i, str.replaceAll(oldStr, newStr));
+                }
+            }
+            FileUtils.writeLines(file, StandardCharsets.UTF_8.name(), list, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
     public static void main(String[] args) {
         try {

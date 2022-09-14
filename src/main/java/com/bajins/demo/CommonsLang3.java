@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  * @see ComparatorChain 多元素排序
  * @see BeanComparator 实现自然排序（根据ASCII码排序）
  * @see FixedOrderComparator 指定排序规则
+ * @see SerializationUtils 指定排序规则
  */
 public class CommonsLang3 {
 
@@ -132,7 +133,7 @@ public class CommonsLang3 {
         StringUtils.equalsIgnoreCase("abc", "ABC");// true
 
         // 比较字符串数组内的所有元素的字符序列，起始一致则返回一致的字符串，若无则返回""
-        StringUtils.getCommonPrefix(new String[]{"abcde", "abxyz"});// "ab"
+        StringUtils.getCommonPrefix("abcde", "abxyz");// "ab"
 
         // 正向查找字符在字符串中第一次出现的位置
         StringUtils.indexOf("aabaabaa", "b");// 2

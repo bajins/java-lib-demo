@@ -3,6 +3,10 @@ package com.bajins.demo.cache;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -23,6 +27,8 @@ import java.util.*;
  * pipeline会把多个命令集中在一次请求发送到redis执行（减少网络开销） https://juejin.cn/post/6844903922046337038
  * https://blog.csdn.net/aizhupo1314/article/details/121231121
  * https://blog.csdn.net/w1lgy/article/details/84455579
+ * https://zhuanlan.zhihu.com/p/531256159
+ * https://juejin.cn/post/6906821149380837384
  */
 public class JedisUtils {
 
@@ -467,6 +473,45 @@ public class JedisUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+    private static final String LOCK_PREFIX = "test";
+    private static final long LOCK_EXPIRE = 111;
+
+    /**
+     * 最终加强分布式锁
+     *
+     * @param key key值
+     * @return 是否获取到
+     */
+    public boolean lock(String key) {
+        String lock = LOCK_PREFIX + key;
+        // 利用lambda表达式
+        return (Boolean) redisTemplate.execute(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                long expireAt = System.currentTimeMillis() + LOCK_EXPIRE + 1;
+                Boolean acquire = redisConnection.setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
+                if (Boolean.TRUE.equals(acquire)) {
+                    return true;
+                } else {
+                    byte[] value = redisConnection.get(lock.getBytes());
+                    if (Objects.nonNull(value) && value.length > 0) {
+                        long expireTime = Long.parseLong(new String(value));
+                        if (expireTime < System.currentTimeMillis()) {
+                            // 如果锁已经过期
+                            byte[] oldValue = redisConnection.getSet(lock.getBytes(),
+                                    String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
+                            // 防止死锁
+                            return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
+                        }
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     public static void main(String[] args) {
