@@ -27,6 +27,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.*;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.LinkedMultiValueMap;
@@ -177,7 +178,18 @@ public class TemplateLearning {
      * 在spring中使用aop注入时需注意：spring可能有RestTemplate的默认配置（请求头等），导致在某些情况下会有差异，所以最好是自己进行初始化
      */
     public static void restTemplate() throws JsonProcessingException {
-        RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(1000);
+        RestTemplate restTemplate = new RestTemplate(requestFactory); // 根据工厂创建
+
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        List<MediaType> mediaTypes = new ArrayList<>();
+        mediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
+        converter.setSupportedMediaTypes(mediaTypes);
+        restTemplate.getMessageConverters().add(converter); // 添加支持的类型
+        /*converter.setSupportedMediaTypes(Arrays.asList(MediaType.ALL));
+        restTemplate.getMessageConverters().add(0, converter);*/
+
         //restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(Charset.forName("GBK")));
         restTemplate.getMessageConverters().forEach(httpMessageConverter -> { // 请求设置编码
             if (httpMessageConverter instanceof StringHttpMessageConverter) {
@@ -220,7 +232,7 @@ public class TemplateLearning {
 
         ParameterizedTypeReference<Map<String, Object>> parameterizedTypeReference =
                 new ParameterizedTypeReference<Map<String, Object>>() {
-                };
+        };
         /*
          * GET请求
          */

@@ -8,10 +8,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
+import redis.clients.jedis.*;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
 
@@ -29,6 +26,7 @@ import java.util.*;
  * https://blog.csdn.net/w1lgy/article/details/84455579
  * https://zhuanlan.zhihu.com/p/531256159
  * https://juejin.cn/post/6906821149380837384
+ * https://blog.csdn.net/qq_40378034/article/details/120105083
  */
 public class JedisUtils {
 
@@ -538,6 +536,28 @@ public class JedisUtils {
             // 关闭管道，将不同类型的操作命令合并提交，同步获取所有结果（不加这句服务器也会放入数据，但是拿不到所有结果）
             List<Object> objects = pipeline.syncAndReturnAll();
             System.out.println(objects);
+        }*/
+
+        /*
+        // 1、开启事务
+        Transaction multi = jedis.multi();
+        //jedis.watch(result);  //加乐观锁，监视
+        try {
+            // 2、命令入队
+            multi.set("user1", result);
+            multi.set("user2",result);
+            int i = 1/0;  //手动设置一个运行时异常，看是不是会出现运行时异常，然后被catch捕获
+            // 3、执行，这三个步骤也都是和linux中操作redis命令一模一样
+            multi.exec();
+        } catch (Exception e) {
+            // 当出现错误，放弃事务
+            multi.discard();
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println(jedis.get("user1"));
+            System.out.println(jedis.get("user2"));
+            //关闭连接
+            jedis.close();
         }*/
     }
 
