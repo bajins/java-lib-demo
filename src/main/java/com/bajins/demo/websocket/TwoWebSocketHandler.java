@@ -25,15 +25,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description WebSocketHandler WebSocket处理器
  * @create 2018-05-29 11:03
  */
-public class WebSocketHandler extends AbstractWebSocketHandler {
+public class TwoWebSocketHandler extends AbstractWebSocketHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(TwoWebSocketHandler.class);
 
     // 存储在线用户，可以使用缓存
     private static final Map<String, WebSocketSession> users = new ConcurrentHashMap<>();
 
     /**
-     * 初次链接成功后执行
+     * 初次链接成功后执行，对应@OnOpen
      * 这里的WebSocketSession里存储的就是拦截器在beforeHandshake方法里存储的内容
      *
      * @param webSocketSession
@@ -66,7 +66,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 发送消息
+     * 发送消息，对应@OnMessage
      *
      * @param webSocketSession
      * @param webSocketMessage
@@ -103,7 +103,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 消息发送错误处理
+     * 消息发送错误处理，对应@OnError
      *
      * @param webSocketSession
      * @param throwable
@@ -126,7 +126,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 关闭连接后触发
+     * 关闭连接后触发，对应@OnClose
      * 这里可以自定义业务逻辑，比如：给是好友关系的发送消息提示该用户已经离线
      *
      * @param webSocketSession

@@ -384,7 +384,7 @@
                 <configuration>
                     <fork>true</fork>
                     <!-- main启动方法类 -->
-                    <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                    <mainClass>com.bajins.demo.springboot.BajinsApiApplication</mainClass>
                     <finalName>${project.name}</finalName>
                 </configuration>
             </plugin>
@@ -434,7 +434,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <!-- jar启动入口类，这个需要修改-->
-                            <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                            <mainClass>com.bajins.demo.springboot.BajinsApiApplication</mainClass>
                         </manifest>
                     </archive>
                     <outputDirectory>${build.dir}</outputDirectory>
@@ -481,7 +481,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>&ndash;&gt;
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.bajins.demo.BajinsApiApplication</mainClass>
+                                    <mainClass>com.bajins.demo.springboot.BajinsApiApplication</mainClass>
                                 </transformer>
                             </transformers>
                             &lt;!&ndash; 打包后找不到main方法，加入以下过滤器 &ndash;&gt;

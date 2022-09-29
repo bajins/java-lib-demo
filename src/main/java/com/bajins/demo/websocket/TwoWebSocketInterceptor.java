@@ -20,9 +20,9 @@ import java.util.Map;
  * @create 2018-05-29 11:01
  */
 @Component
-public class WebSocketInterceptor implements HandshakeInterceptor {
+public class TwoWebSocketInterceptor implements HandshakeInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(TwoWebSocketInterceptor.class);
 
     /**
      * 初次握手访问前，可以把客户端传来的识别信息先鉴权，然后存储到缓存，方便之后使用
