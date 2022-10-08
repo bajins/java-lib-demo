@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.util.Pair;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 /**
@@ -171,5 +173,10 @@ public class SpringUtilLearning {
 
         /*WebApplicationContext wac = (WebApplicationContext)servletContext.getAttribute(
                 WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);*/
+
+        // 线程池中创建 ThreadFactory 设置线程名称
+        ThreadFactory springThreadFactory = new CustomizableThreadFactory("springThread-pool-");
+        ExecutorService exec = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(10), springThreadFactory);
     }
 }

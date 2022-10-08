@@ -3,8 +3,10 @@ package com.bajins.demo;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.List;
+import java.util.concurrent.*;
 
 public class GuavaLearning {
     /**
@@ -60,5 +62,9 @@ public class GuavaLearning {
             }
         });*/
 
+        // 线程池中创建 ThreadFactory 设置线程名称
+        ThreadFactory guavaThreadFactory = new ThreadFactoryBuilder().setNameFormat("retryClient-pool-").build();
+        ExecutorService exec = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(10), guavaThreadFactory);
     }
 }

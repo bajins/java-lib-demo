@@ -4,6 +4,7 @@ import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.StringEscapeUtils;
@@ -15,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -279,6 +281,11 @@ public class CommonsLang3 {
          */
         //Collections.<Student> sort(list, new BeanComparator<Student>("score"));
 
+        // 线程池中创建 ThreadFactory 设置线程名称
+        ThreadFactory basicThreadFactory = new BasicThreadFactory.Builder().daemon(true).namingPattern(
+                "basicThreadFactory-").build();
+        ExecutorService exec = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(10), basicThreadFactory);
     }
 
     /**
