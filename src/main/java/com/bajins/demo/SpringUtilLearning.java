@@ -46,6 +46,8 @@ import java.util.stream.Stream;
  * @see BridgeMethodResolver 桥接方法分析器
  * @see GenericTypeResolver 范型分析器, 在用于对范型方法, 参数分析
  * @see NestedExceptionUtils
+ * @see NamedThreadLocal
+ * @see NamedInheritableThreadLocal
  * <br/>
  * @see org.springframework.core.annotation
  * @see AnnotationUtils 处理注解
@@ -79,8 +81,9 @@ import java.util.stream.Stream;
  * @see WebUtils
  * </br>
  * @see org.springframework.web.bind.ServletRequestUtils
- * @see RequestContextHolder
+ * @see RequestContextHolder 子线程获取RequestAttributes https://blog.csdn.net/qq_25775675/article/details/125617310
  * @see RequestContextUtils
+ * @see DateTimeContextHolder
  * @see TransactionSynchronizationManager
  * @see LocaleContextHolder
  * @see ConfigurableListableBeanFactory Spring应用上下文环境
@@ -92,16 +95,24 @@ import java.util.stream.Stream;
  * @see WebApplicationObjectSupport
  * @see BeanFactoryPostProcessor
  * </br> Interceptor拦截器，基于Java的反射机制（动态代理）实现
- * @see HandlerInterceptor 请求地址拦截器
+ * <pre> 调用顺序：
+ * HandlerInterceptor.preHandle -> RequestBodyAdvice.supports -> RequestBodyAdvice.beforeBodyRead ->
+ * RequestBodyAdvice.supports -> RequestBodyAdvice.afterBodyRead -> @RestController/@Controller ->
+ * ResponseBodyAdvice.supports -> ResponseBodyAdvice.beforeBodyWrite -> HandlerInterceptor.postHandle ->
+ * HandlerInterceptor.afterCompletion
+ * </pre>
+ * @see HandlerInterceptor 请求地址拦截器，调用顺序：preHandle -> Contorller -> postHandle -> afterCompletion
  * @see AsyncHandlerInterceptor
  * @see HandlerExceptionResolver
  * @see MethodInterceptor AOP项目中方法拦截器
  * @see LocaleChangeInterceptor
  * @see ThemeChangeInterceptor
- * @see RequestBodyAdvice
+ * @see WebRequestInterceptor
+ * @see RequestBodyAdvice 配合@ControllerAdvice
  * @see ResponseBodyAdvice
- * </br> Filter过滤器，基于函数回调
- * @see Filter 过滤器
+ * </br> Filter 是Servlet过滤器，基于函数回调
+ * @see Filter 过滤器 @ServletComponentScan @WebFilter @WebListener @WebServlet
+ * @see OncePerRequestFilter
  */
 public class SpringUtilLearning {
 
