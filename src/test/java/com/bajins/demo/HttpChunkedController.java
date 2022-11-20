@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @CrossOrigin // https://www.pangjian.me/2021/05/20/cors-failed-with-transfer-encoding-chunked
 @Controller
 @RequestMapping("/app")
-public class ChunkedController {
+public class HttpChunkedController {
 
     /**
      * 使用 Callable 接口异步调用任务方法，StreamingResponseBody 输出流对象

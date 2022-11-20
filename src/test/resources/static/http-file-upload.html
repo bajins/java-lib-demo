@@ -11,9 +11,9 @@
         扫描文件
         <label style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: inline-block;
         cursor: pointer; background: rgb(255, 255, 255); overflow: hidden; opacity: 0;">
-        <input type="file" class="form-control"
-               style="position: absolute; clip: rect(1px, 1px, 1px, 1px);" id="files" min="1"
-               multiple="multiple" accept="*.*" readonly="readonly"/>
+            <input type="file" class="form-control"
+                   style="position: absolute; clip: rect(1px, 1px, 1px, 1px);" id="files" min="1"
+                   multiple="multiple" accept="*.*" readonly="readonly"/>
         </label>
     </button>
     <input type="file" id="folder" webkitdirectory/>
@@ -29,7 +29,27 @@
             const output = document.getElementById("listing");
             const files = event.target.files;
 
-            // https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
+            // form表单元素 https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form
+            const form = document.createElement("form");
+            form.action = "";
+            form.method = "POST";
+            form.enctype = "multipart/form-data";
+            form.style = "display:none;";
+            form.target = "callBackTarget";
+            form.append('id', "id"); // 参数只接受字符串或文件，后端取值时不能自动转换为对象
+            for (let i = 0; i < files.length; i++) {
+                let input = document.createElement("input");
+                input.type = "file";
+                input.name = "file"; // 多个input为同一个name参数会变成列表，且用getAll获取所有值
+                input.value = files[i];
+                form.append(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+
+            // form表单对象 https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
             const formData = new FormData();
             // 所有字段都append进去
             formData.append('id', "id"); // 参数只接受字符串或文件，后端取值时不能自动转换为对象
@@ -45,6 +65,21 @@
             console.log(formData.get("id"));
             console.log($("#files")[0].files);
             console.log($("#folder")[0].files);
+
+            $.ajax({
+                url: url,
+                data: formData,
+                dataType: "json",
+                type: "POST",
+                cache: false, // 上传文件无需缓存
+                processData: false, // 用于对data参数进行序列化处理，这里必须false
+                // 告诉jquery不要设置content-Type请求头，会自动设置为multipart/form-data; boundary=----WebKitFormBoundary
+                contentType: false,
+                success: function (res: any) {
+                },
+                error: function (err: any) {
+                }
+            });
             // 样式 https://www.cnblogs.com/hamsterPP/p/5804512.html
             // 分割上传 https://blog.csdn.net/oYuLian/article/details/89241617
             // https://www.cnblogs.com/yuerdong/p/9792443.html
@@ -53,19 +88,6 @@
             // 读取ZIP https://blog.csdn.net/lqlqlq007/article/details/121242545
             // https://blog.csdn.net/weixin_42448623/article/details/107845783
             // https://stuk.github.io/jszip/documentation/howto/read_zip.html
-            /*$.ajax({
-                url: 'XXXX ',
-                data: formData,
-                dataType: "json",
-                type: "POST",
-                cache: false, // 上传文件无需缓存
-                processData: false, // 用于对data参数进行序列化处理 这里必须false
-                contentType: false, // 告诉jquery不要设置content-Type请求头
-                success: function (res: any) {
-                },
-                error: function (err: any) {
-                }
-            });*/
         }, false);
     });
 </script>

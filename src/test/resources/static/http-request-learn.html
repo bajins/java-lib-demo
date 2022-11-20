@@ -1,0 +1,101 @@
+<html lang="zh_CN">
+
+<head>
+    <title>HTTP请求学习</title>
+</head>
+
+<body>
+<div>
+    <h1>HTTP请求学习</h1>
+    <button type="button" class="next-btn next-medium next-btn-primary" id="btn">请求</button>
+    <div style="display: none">
+        <form>
+
+        </form>
+
+        <!--form表单提交并获取返回值json，且阻止默认的跳转动作-->
+        <!--form表单的target属性值等于iframe的name和id，这时用iframe来接收返回值，且默认让iframe去跳转-->
+        <form target="form" action="" enctype="multipart/form-data" method="post">
+            <input type="file">
+            <button type="submit" id="submit" style="display:none">提交</button>
+        </form>
+        <iframe name="form" id="form" style="display:none"></iframe>
+    </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        document.getElementById("btn").addEventListener("click", function (event) {
+            // https://zhuanlan.zhihu.com/p/41957768
+            // https://segmentfault.com/a/1190000020002603
+
+
+            const fm = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7};
+            const url = "";
+            /*
+             * 表单请求
+             */
+
+            // form表单元素 https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form
+            const form = document.createElement("form");
+            form.action = url;
+            form.method = "POST";
+            form.enctype = "multipart/form-data";
+            form.style = "display:none;";
+            form.target = "callBackTarget";
+            // 所有字段都append进去
+            for (const [k, v] of Object.entries(fm)) {
+                let input = document.createElement("input");
+                input.type = "hidden";
+                input.name = k; // 多个参数向同一个name中赋值会变成列表，且用getAll获取所有值
+                input.value = v;
+                form.append(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+
+            // Form表单提交之后，获取返回值 https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/Input/submit#formtarget
+            $("#form").attr("action", url).load(function () {
+                const text = $(this).contents().find("body").text(); //获取到的是json的字符串
+                const j = JSON.parse(text);  //json字符串转换成json对象
+                console.log(j)
+            });
+            $("#submit").click();
+
+
+            // form表单对象 https://developer.mozilla.org/zh-CN/docs/Web/API/FormData
+            const formData = new FormData();
+            // 所有字段都append进去
+            for (const [k, v] of Object.entries(fm)) {
+                // https://www.cnblogs.com/goloving/p/15272036.html
+                formData.append(k, v); // 多个参数向同一个name中赋值会变成列表，且用getAll获取所有值
+            }
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                // cache: false,
+                processData: false, // 告诉jQuery不要去序列化处理发送的数据
+                // 告诉jquery不要设置content-Type请求头，会自动设置为multipart/form-data; boundary=----WebKitFormBoundary
+                contentType: false,
+                dataType: "json",
+                success: function (res: any) {
+                },
+                error: function (err: any) {
+                }
+            });
+
+
+            /*
+             * JSON请求
+             */
+        }, false);
+    });
+</script>
+
+</body>
+
+</html>

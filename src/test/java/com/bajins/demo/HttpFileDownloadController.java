@@ -36,7 +36,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/down")
-public class DownloadFileController {
+public class HttpFileDownloadController {
 
     /**
      * 使用

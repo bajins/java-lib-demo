@@ -1,0 +1,136 @@
+<html lang="zh_CN">
+
+<head>
+    <title>下载文件</title>
+</head>
+
+<body>
+<div>
+    <h1>下文件</h1>
+    <button type="button" class="next-btn next-medium next-btn-primary" id="btn">下载</button>
+
+    <div style="display: none">
+        <form style="display:none" target="" method="get" id="form2"></form>
+    </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        document.getElementById("btn").addEventListener("click", function (event) {
+            const url = 'https://www.bajins.com/files/设置必应壁纸.bat';
+            // 此方法火狐有些版本不支持
+            window.location.href = url;
+            // 支持所有
+            window.location = url;
+
+            // iframe
+            const elemIF = document.createElement("iframe");
+            elemIF.src = url;
+            elemIF.style.display = "none";
+            document.body.appendChild(elemIF);
+            elemIF.remove();
+
+
+            // form表单
+            const form1 = $(`<form style="display:none" target="" method="get" action={url}></form>`);
+            document.body.append(form1);
+            form1.submit();//表单提交
+            form1.remove();
+
+            const form2 = document.getElementById("form2");
+            form2.action = url;
+            form2.submit();
+
+            // https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form
+            const form = document.createElement("form");
+            form.action = url;
+            form.method = "POST";
+            form.enctype = "multipart/form-data";
+            form.style = "display:none;";
+            form.target = "callBackTarget";
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+
+            // a标签
+            const a = document.createElement("a");
+            a.style.display = 'none';
+            a.download = url.substring(url.lastIndexOf("/"));
+            a.href = url;
+            document.body.append(a); // 修复firefox中无法触发click
+            a.click();
+            // const event = new MouseEvent("click"); // 创建一个单击事件
+            // a.dispatchEvent(event); // 触发a的单击事件
+            a.remove();
+
+
+            // XHR请求 https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true); // 也可以使用POST方式，根据接口
+            // 设置请求头，必须要放到open()后面
+            xhr.setRequestHeader("content-type", "application/json");
+            xhr.responseType = "blob"; // 返回类型 "arraybuffer", "blob", "document", "json", and "text".
+            // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+            xhr.onload = function () {
+                // 请求完成，返回200
+                if (this.status === 200) {
+                    return;
+                }
+                if (Object.getPrototypeOf(xhr.response) === Blob.prototype) { // 二进制
+
+                    if (xhr.response.type === 'application/json') { // blob转json
+                        let reader = new FileReader();
+                        reader.readAsText(result.data, 'utf-8');
+                        reader.onload = (e) => {
+                            console.log(JSON.parse(reader.result));
+                            console.log(JSON.parse(e.target.result));
+                        }
+                        /*const enc = new TextDecoder('utf-8');
+                        result.data.arrayBuffer().then(buffer => {
+                            console.log(JSON.parse(enc.decode(new Uint8Array(buffer))));
+                        });*/
+                    } else if (xhr.response.type === 'application/octet-stream') {
+                        // 方式一
+                        const reader = new FileReader();
+                        // https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader/readAsArrayBuffer
+                        // reader.readAsArrayBuffer(this.response);
+                        reader.readAsDataURL(this.response); // 转换为base64
+                        reader.onload = function (e) {
+                            // 转换完成，创建一个a标签用于下载
+                            const a = document.createElement("a");
+                            a.download = filename;
+                            a.href = e.target.result;
+                            document.body.append(a); // 修复firefox中无法触发click
+                            a.click();
+                            a.remove();
+                        }
+                        // 方式二
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        // 创建下载的链接
+                        // a.href = URL.createObjectURL(new Blob([this.response], {type: this.getResponseHeader('Content-Type')}));
+                        a.href = this.response;
+                        // 下载后文件名
+                        a.download = filename;
+                        // 点击下载
+                        a.click();
+                        // 释放掉blob对象
+                        URL.revokeObjectURL(a.href);
+                        a.remove();
+                    }
+                }
+            }
+            // 发送请求，携带参数为可选
+            xhr.send();
+
+
+            // 分块下载，断点续传
+
+        }, false);
+    });
+</script>
+
+</body>
+
+</html>

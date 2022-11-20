@@ -200,6 +200,7 @@ public class JacksonLearning {
         // SerializeFilter
         // SimplePropertyPreFilter
         // ValueFilter
+        // SerializerFeature https://blog.csdn.net/qq_45441466/article/details/110393204
         JSONObject.toJSONString(request, new PropertyPreFilter() { // 序列化HttpServletRequest
             @Override
             public boolean apply(JSONSerializer paramJSONSerializer, Object paramObject, String paramString) {
@@ -210,7 +211,21 @@ public class JacksonLearning {
                 names.add("reader");
                 return !names.contains(paramString);
             }
-        });*/
+        });
+        // 定义一个转换消息的对象
+        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
+        List<MediaType> fastMediaTypes = new ArrayList<MediaType>();
+        fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+        fastConverter.setSupportedMediaTypes(fastMediaTypes);
+        // 添加fastjson的配置信息 比如 ：是否要格式化返回的json数据
+        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        // WriteMapNullValue把空的值的key也返回  需要其他的序列化规则按照格式设置即可
+        fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
+        // 处理中文乱码问题
+        fastJsonConfig.setCharset(StandardCharsets.UTF_8);
+        // 在转换器中添加配置信息
+        fastConverter.setFastJsonConfig(fastJsonConfig);
+        */
     }
 
     /**

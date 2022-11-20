@@ -21,11 +21,13 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/upload")
-public class UploadFileController {
+public class HttpFileUploadController {
 
 
     /**
      * 上传文件
+     * <p>
+     * https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.spring-mvc.multipart-file-uploads
      *
      * @param file
      * @param response
