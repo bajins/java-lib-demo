@@ -36,6 +36,7 @@ import java.util.List;
  * 修改spring-context-web.xml中/WEB-INF/views.xml为file:webapp/WEB-INF/views.xml，<br/>
  * 解决报错：Could not open ServletContext resource [/WEB-INF/views.xml]
  * </p>
+ * MockMvc https://www.jianshu.com/p/d73b74bc792c
  *
  * @see org.apache.ibatis.builder.xml.XMLMapperEntityResolver mybatis默认解析类
  */

@@ -1,19 +1,52 @@
 package com.bajins.demo;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.*;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.core.NamedInheritableThreadLocal;
+import org.springframework.core.NamedThreadLocal;
+import org.springframework.core.NestedExceptionUtils;
+import org.springframework.core.io.*;
 import org.springframework.core.io.support.EncodedResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.core.task.*;
+import org.springframework.core.task.support.ConcurrentExecutorAdapter;
+import org.springframework.core.task.support.ExecutorServiceAdapter;
+import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.data.util.Pair;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+import org.springframework.format.datetime.standard.DateTimeContextHolder;
+import org.springframework.objenesis.instantiator.util.UnsafeUtils;
+import org.springframework.scheduling.concurrent.*;
+import org.springframework.scheduling.quartz.LocalTaskExecutorThreadPool;
+import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.WebRequestInterceptor;
+import org.springframework.web.context.request.async.WebAsyncUtils;
+import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.WebApplicationObjectSupport;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.web.servlet.theme.ThemeChangeInterceptor;
+import org.springframework.web.util.*;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
@@ -33,6 +66,7 @@ import java.util.stream.Stream;
  * @see AopProxyUtils
  * @see AopUtils
  * @see ClassUtils
+ * @see UnsafeUtils
  * @see DigestUtils
  * @see SerializationUtils
  * <br/>
@@ -114,6 +148,28 @@ import java.util.stream.Stream;
  * </br> Filter 是Servlet过滤器，基于函数回调
  * @see Filter 过滤器 @ServletComponentScan @WebFilter @WebListener @WebServlet
  * @see OncePerRequestFilter
+ * </br>
+ * @see org.springframework.core.task
+ * @see TaskExecutor
+ * @see AsyncTaskExecutor
+ * @see AsyncListenableTaskExecutor
+ * @see SimpleAsyncTaskExecutor 非重用线程池，每次调用都会创建一个新的线程
+ * @see SyncTaskExecutor 非异步执行
+ * @see ConcurrentExecutorAdapter
+ * @see ExecutorServiceAdapter
+ * @see org.springframework.util.concurrent
+ * @see ListenableFutureTask
+ * @see org.springframework.scheduling.concurrent
+ * @see ThreadPoolTaskExecutor
+ * @see ThreadPoolTaskScheduler
+ * @see TaskExecutorAdapter
+ * @see ConcurrentTaskExecutor
+ * @see ConcurrentTaskScheduler
+ * @see org.springframework.jca.work
+ * @see WorkManagerTaskExecutor
+ * @see org.springframework.scheduling.quartz
+ * @see LocalTaskExecutorThreadPool
+ * @see SimpleThreadPoolTaskExecutor Quartz的SimpleThreadPool类的子类，它会监听Spring的生命周期回调
  */
 public class SpringUtilLearning {
 
