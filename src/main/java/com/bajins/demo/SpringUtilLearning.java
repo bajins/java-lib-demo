@@ -7,8 +7,9 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.context.support.*;
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.NestedExceptionUtils;
@@ -37,6 +38,7 @@ import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -122,13 +124,19 @@ import java.util.stream.Stream;
  * @see TransactionSynchronizationManager
  * @see LocaleContextHolder
  * @see ConfigurableListableBeanFactory Spring应用上下文环境
+ * @see BeanFactoryPostProcessor
  * @see ApplicationContext https://www.cnblogs.com/pijunqi/p/14131648.html
  * @see WebApplicationContext
  * @see WebApplicationContextUtils
+ * @see ClassPathXmlApplicationContext
+ * @see FileSystemXmlApplicationContext
+ * @see GenericApplicationContext
+ * @see AnnotationConfigApplicationContext
+ * @see StaticApplicationContext
+ * @see XmlWebApplicationContext
  * @see ApplicationContextAware
  * @see ApplicationObjectSupport
  * @see WebApplicationObjectSupport
- * @see BeanFactoryPostProcessor
  * </br> Interceptor拦截器，基于Java的反射机制（动态代理）实现
  * <pre> 调用顺序：
  * HandlerInterceptor.preHandle -> RequestBodyAdvice.supports -> RequestBodyAdvice.beforeBodyRead ->

@@ -3,15 +3,29 @@ package com.bajins.demo;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.validation.constraints.NotNull;
 
 /**
  * 获取Spring上下文环境并获取其管理的Bean对象
+ *
+ * @see ApplicationContextAware
+ * @see ClassPathXmlApplicationContext
+ * @see FileSystemXmlApplicationContext
+ * @see GenericApplicationContext
+ * @see AnnotationConfigApplicationContext
+ * @see StaticApplicationContext
+ * @see XmlWebApplicationContext
  */
 @Component
-public class ApplicationContextUtil implements ApplicationContextAware {
+public class SpringAppContextUtils implements ApplicationContextAware {
 
     /**
      * Spring上下文
@@ -26,7 +40,7 @@ public class ApplicationContextUtil implements ApplicationContextAware {
      */
     @Override
     public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
-        ApplicationContextUtil.applicationContext = applicationContext;
+        SpringAppContextUtils.applicationContext = applicationContext;
     }
 
     /**

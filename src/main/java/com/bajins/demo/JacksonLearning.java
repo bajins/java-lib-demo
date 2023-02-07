@@ -245,8 +245,9 @@ public class JacksonLearning {
 
     /**
      * 出参保留两位小数
-     *
-     * @JsonDeserialize(using = DeserializerBigDecimal.class)
+     * <pre>
+     * &#064;JsonDeserialize(using  = DeserializerBigDecimal.class)
+     * </pre>
      */
     public static class DeserializerBigDecimal extends JsonDeserializer<BigDecimal> {
         @Override
@@ -262,8 +263,9 @@ public class JacksonLearning {
 
     /**
      * 入参保留两位小数
-     *
-     * @JsonSerialize(using = SerializerBigDecimal.class)
+     * <pre>
+     * &#064;JsonSerialize(using  = SerializerBigDecimal.class)
+     * </pre>
      */
     public static class SerializerBigDecimal extends JsonSerializer<BigDecimal> {
         @Override

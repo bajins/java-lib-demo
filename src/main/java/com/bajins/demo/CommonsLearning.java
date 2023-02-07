@@ -19,10 +19,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -131,14 +135,22 @@ public class CommonsLearning {
         List<List<Integer>> subSets = ListUtils.partition(intList, 3);
         List<Integer> lastPartition = subSets.get(2);
 
-        try { // https://cloud.tencent.com/developer/article/1497667
+        try {
+            PropertiesConfiguration conf = new PropertiesConfiguration(); // 配置文件读取，支持重复KEY
+            try {
+                conf.read(new FileReader(CommonsLearning.class.getClassLoader().getResource("test.properties").toString()));
+            } catch (ConfigurationException | IOException e) {
+                e.printStackTrace();
+            }
+
+            // https://cloud.tencent.com/developer/article/1497667
             Configurations configs = new Configurations();
 
             // 设置编码，此处的实际是个PropertiesConfiguration，它默认采用的是`ISO-8859-1`所以中文乱码~
             // 注意：这个前提是你的properties文件是utf-8编码的~~~
             FileBasedConfigurationBuilder.setDefaultEncoding(PropertiesConfiguration.class,
                     StandardCharsets.UTF_8.name());
-            // 每个Configuration代表这一个配置文件~（依赖beanutils这个jar）
+            // 每个Configuration代表着一个配置文件~（依赖beanutils这个jar）
             Configuration config = configs.properties("my.properties");
 
             // 采用Builder模式处理更为复杂的一些场景   比如把逗号分隔的字符串解析到数组、解析到list、前后拼接字符串等等操作
