@@ -1,12 +1,12 @@
 package com.bajins.demo;
 
+import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.*;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.beans.IntrospectionException;
@@ -27,6 +27,13 @@ import java.util.stream.Collectors;
  * @see BeanComparator 实现自然排序（根据ASCII码排序）
  * @see FixedOrderComparator 指定排序规则
  * @see SerializationUtils 指定排序规则
+ * @see IOUtils
+ * @see ImmutablePair
+ * @see ImmutableTriple
+ * @see MutablePair
+ * @see MutableTriple
+ * @see Pair
+ * @see Triple
  */
 public class CommonsLang3 {
 

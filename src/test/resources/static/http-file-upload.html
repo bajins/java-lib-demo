@@ -40,7 +40,7 @@
             for (let i = 0; i < files.length; i++) {
                 let input = document.createElement("input");
                 input.type = "file";
-                input.name = "file"; // 多个input为同一个name参数会变成列表，且用getAll获取所有值
+                input.name = "files"; // 多个input为同一个name参数会变成列表，且用getAll获取所有值
                 input.value = files[i];
                 form.append(input);
             }
@@ -53,15 +53,16 @@
             const formData = new FormData();
             // 所有字段都append进去
             formData.append('id', "id"); // 参数只接受字符串或文件，后端取值时不能自动转换为对象
+            // formData.append('id', new Blob([JSON.stringify(formm)], {type: 'application/json'}));
             for (let i = 0; i < files.length; i++) {
                 let item = document.createElement("li");
                 item.innerHTML = files[i].webkitRelativePath;
                 output.appendChild(item);
                 // https://www.cnblogs.com/goloving/p/15272036.html
-                formData.append('file', files[i]); // 多个文件向同一个key中赋值会变成列表，且用getAll获取所有值
-                // formData.append('file', files[i], i); // 第三个参数为文件名称，如果不填则取真实文件名
+                formData.append('files', files[i]); // 多个文件向同一个key中赋值会变成列表，且用getAll获取所有值
+                // formData.append('files', files[i], i); // 第三个参数为文件名称，如果不填则取真实文件名
             }
-            console.log(formData.getAll("file"));
+            console.log(formData.getAll("files"));
             console.log(formData.get("id"));
             console.log($("#files")[0].files);
             console.log($("#folder")[0].files);
