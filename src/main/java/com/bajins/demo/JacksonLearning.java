@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.google.common.base.CaseFormat;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -40,7 +42,7 @@ public class JacksonLearning {
      *
      * @throws IOException
      */
-    private static void testJackJson() throws IOException {
+    public static void main(String[] args) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         // 排除json字符串中实体类没有的字段 @JsonIgnore
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -176,56 +178,32 @@ public class JacksonLearning {
         };
         ArrayList<Map<String, Object>> list2 = objectMapper.readValue(ljson, typeReference);
         System.out.println(list2);
-    }
-
-
-    public static void main(String[] args) throws IOException {
-        testJackJson();
 
         /*
-        // https://binarylife.icu/articles/1032
-        // https://www.cnblogs.com/MattCheng/p/8621707.html
-        // https://www.cnblogs.com/diegodu/p/5950057.html
-        // Feature.DisableFieldSmartMatch 用于关闭下划线、大小写
-        // PropertyNamingStrategy https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn
-        // SerializeFilterable 过滤器列表
-        // AfterFilter
-        // BeforeFilter
-        // ContextValueFilter
-        // LabelFilter
-        // NameFilter
-        // PascalNameFilter
-        // PropertyFilter
-        // PropertyPreFilter
-        // SerializeFilter
-        // SimplePropertyPreFilter
-        // ValueFilter
-        // SerializerFeature https://blog.csdn.net/qq_45441466/article/details/110393204
-        JSONObject.toJSONString(request, new PropertyPreFilter() { // 序列化HttpServletRequest
-            @Override
-            public boolean apply(JSONSerializer paramJSONSerializer, Object paramObject, String paramString) {
-                List<String> names = new ArrayList<>();
-                names.add("asyncContext");
-                names.add("asyncStarted");
-                names.add("parts");
-                names.add("reader");
-                return !names.contains(paramString);
-            }
-        });
-        // 定义一个转换消息的对象
-        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
-        List<MediaType> fastMediaTypes = new ArrayList<MediaType>();
-        fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
-        fastConverter.setSupportedMediaTypes(fastMediaTypes);
-        // 添加fastjson的配置信息 比如 ：是否要格式化返回的json数据
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        // WriteMapNullValue把空的值的key也返回  需要其他的序列化规则按照格式设置即可
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
-        // 处理中文乱码问题
-        fastJsonConfig.setCharset(StandardCharsets.UTF_8);
-        // 在转换器中添加配置信息
-        fastConverter.setFastJsonConfig(fastJsonConfig);
-        */
+         * xml和对象互转
+         */
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // 反序列化时，若实体类没有对应的属性，是否抛出JsonMappingException异常，false忽略掉
+        xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        //xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        // 序列化是否绕根元素，true，则以类名为根元素
+        xmlMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+        xmlMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        xmlMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        // 忽略空属性
+        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        // XML标签名:使用骆驼命名的属性名，
+        xmlMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+        // 设置转换模式
+        xmlMapper.enable(MapperFeature.USE_STD_BEAN_NAMING);
+
+        String xml = xmlMapper.writeValueAsString(list2);
+
+        MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter =
+                new MappingJackson2XmlHttpMessageConverter();
+        String xml2 = mappingJackson2XmlHttpMessageConverter.getObjectMapper().writeValueAsString(list2);
     }
 
     /**

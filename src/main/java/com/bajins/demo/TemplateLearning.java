@@ -59,6 +59,7 @@ import java.util.regex.Pattern;
  * @see Template
  * @see StringTemplateLoader
  * @see RestTemplate
+ * @see WebServiceTemplate https://docs.spring.io/spring-ws/docs/4.0.3-SNAPSHOT/reference/html/#client-web-service-template
  * @see org.springframework.jdbc.core.JdbcTemplate SQL中使用（?）占位符
  * @see org.springframework.jdbc.core.SimpleJdbcTemplate SQL中使用（?）占位符
  * @see org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate SQL中使用命名参数（:name）
