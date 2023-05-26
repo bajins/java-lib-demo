@@ -79,6 +79,10 @@
                 success: function (res: any) {
                 },
                 error: function (err: any) {
+                    // https://stackoverflow.com/questions/48127436/how-to-catch-chrome-error-neterr-file-not-found-in-xmlhttprequest
+                    if (err.target.status === 0 && !err.target.statusText && err.target.readyState === 4) {
+                        alert("文件已被修改，请重新选择文件上传");
+                    }
                 }
             });
             // 样式 https://www.cnblogs.com/hamsterPP/p/5804512.html

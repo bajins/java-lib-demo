@@ -74,20 +74,30 @@
             // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
             xhr.onload = function () {
                 // 请求完成，返回200
-                if (this.status === 200) {
+                if (this.status !== 200) {
                     return;
                 }
                 if (Object.getPrototypeOf(xhr.response) === Blob.prototype) { // 二进制
 
                     if (xhr.response.type === 'application/json') { // blob转json
-                        let reader = new FileReader();
-                        reader.readAsText(result.data, 'utf-8');
+                        const reader = new FileReader();
+                        reader.readAsText(this.response, 'utf-8');
                         reader.onload = (e) => {
                             console.log(JSON.parse(reader.result));
                             console.log(JSON.parse(e.target.result));
                         }
-                        /*const enc = new TextDecoder('utf-8');
+                        /*
+                        // readAsArrayBuffer
+                        // readAsBinaryString
+                        // readAsDataURL
+                        // readAsText
+                        // readBuffer
+                        // readEntries
+                        // readPixels
+                        // readText
+                        // readTransaction
                         result.data.arrayBuffer().then(buffer => {
+                            const enc = new TextDecoder('utf-8');
                             console.log(JSON.parse(enc.decode(new Uint8Array(buffer))));
                         });*/
                     } else if (xhr.response.type === 'application/octet-stream') {
@@ -103,6 +113,8 @@
                             a.href = e.target.result;
                             document.body.append(a); // 修复firefox中无法触发click
                             a.click();
+                            // 释放掉blob对象
+                            URL.revokeObjectURL(a.href);
                             a.remove();
                         }
                         // 方式二
@@ -121,6 +133,9 @@
                     }
                 }
             }
+            xhr.onerror = function (err) {
+
+            }
             // 发送请求，携带参数为可选
             xhr.send();
 
@@ -129,6 +144,27 @@
 
         }, false);
     });
+
+    const fileToBase64 = (file, callback) => { // 将 file 转为 base64
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            callback(e.target.result);
+        }
+    }
+
+    const dataURLToFile = (dataUrl, filename) => { // 将 base64 转回 file
+        const arr = dataUrl.split(',')
+        const bStr = window.atob(arr[1])
+        let n = bStr.length
+        const u8arr = new Uint8Array(n)
+        while (n--) {
+            u8arr[n] = bStr.charCodeAt(n)
+        }
+        return new File([u8arr], filename, {
+            type: 'application/octet-stream',
+        });
+    }
 </script>
 
 </body>

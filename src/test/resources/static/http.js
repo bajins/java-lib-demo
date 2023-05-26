@@ -185,6 +185,10 @@ const ajax = (settings = {}) => {
     });
     // 请求出错，对应xhr.onerror
     xhr.addEventListener('error', e => {
+        // https://stackoverflow.com/questions/48127436/how-to-catch-chrome-error-neterr-file-not-found-in-xmlhttprequest
+        if (e.target.status === 0 && !e.target.statusText && e.target.readyState === 4) {
+            alert("文件已被修改，请重新选择文件上传");
+        }
         config.error(xhr, xhr.status, e);
     });
     // 请求超时，对应xhr.ontimeout

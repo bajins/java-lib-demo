@@ -30,6 +30,7 @@ import org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -70,11 +71,11 @@ import java.util.stream.Stream;
  * @see ClassUtils
  * @see UnsafeUtils
  * @see DigestUtils
- * @see SerializationUtils
+ * @see SerializationUtils 序列化，深拷贝
  * @see StreamUtils
  * <br/>
  * @see org.springframework.beans JavaBean相关操作
- * @see BeanUtils
+ * @see BeanUtils 浅拷贝
  * @see PropertyAccessorUtils
  * @see PropertyDescriptorUtils
  * @see BeanWrapperImpl
@@ -148,6 +149,7 @@ import java.util.stream.Stream;
  * @see HandlerInterceptor 请求地址拦截器，调用顺序：preHandle -> Contorller -> postHandle -> afterCompletion
  * @see AsyncHandlerInterceptor
  * @see HandlerExceptionResolver
+ * @see HandlerMethodArgumentResolver
  * @see MethodInterceptor AOP项目中方法拦截器
  * @see LocaleChangeInterceptor
  * @see ThemeChangeInterceptor
@@ -228,8 +230,8 @@ public class SpringUtilLearning {
 
         ClassPathResource classPathResource = new ClassPathResource("com/test/config/config.properties");
 
-        Assert.notNull(text, "内容为空");
-        Assert.hasText(text, "内容为空");
+        //Assert.notNull(text, "内容为空");
+        //Assert.hasText(text, "内容为空");
 
 
         // 使用org.springframework.wechatutil.StringUtils.countOccurrencesOf查找并统计子串出现在字符串中的次数
@@ -242,7 +244,10 @@ public class SpringUtilLearning {
 
         //org.springframework.beans.BeanUtils.copyProperties();
         //org.springframework.cglib.beans.BeanCopier.create().copy();
-        //BeanUtils.copyProperties(Object source, Object target, String... ignoreProperties);
+        //BeanUtils.copyProperties(Object source, Object target, String... ignoreProperties); // 浅拷贝
+
+        //SerializationUtils.serialize() // 深拷贝
+        //SerializationUtils.deserialize()
 
         // 二元组
         Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");

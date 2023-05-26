@@ -19,6 +19,7 @@ import java.util.Map;
 
 /**
  * 文件上传（含携带参数）：单文件、多文件、携带参数、分片上传、断点续传、追加上传、表单上传、流式上传
+ * https://mp.weixin.qq.com/s/J55UtidL_WI0zSJM1C7kXQ
  *
  * @link <a href="https://help.aliyun.com/document_detail/32013.html">参考OSS文件上传</a>
  * @see MultipartFile

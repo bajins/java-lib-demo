@@ -29,12 +29,16 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.*;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
+import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.ws.client.core.WebServiceTemplate;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -59,7 +63,8 @@ import java.util.regex.Pattern;
  * @see Template
  * @see StringTemplateLoader
  * @see RestTemplate
- * @see WebServiceTemplate https://docs.spring.io/spring-ws/docs/4.0.3-SNAPSHOT/reference/html/#client-web-service-template
+ * @see WebServiceTemplate
+ * https://docs.spring.io/spring-ws/docs/4.0.3-SNAPSHOT/reference/html/#client-web-service-template
  * @see org.springframework.jdbc.core.JdbcTemplate SQL中使用（?）占位符
  * @see org.springframework.jdbc.core.SimpleJdbcTemplate SQL中使用（?）占位符
  * @see org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate SQL中使用命名参数（:name）
@@ -70,8 +75,12 @@ import java.util.regex.Pattern;
  * @see AbstractDataSource
  * @see SingleConnectionDataSource
  * @see DriverManagerDataSource
- * @see TransactionAwareDataSourceProxy
+ * @see PlatformTransactionManager 事务管理
+ * @see AbstractPlatformTransactionManager
+ * @see ResourceTransactionManager
  * @see DataSourceTransactionManager
+ * @see TransactionAwareDataSourceProxy
+ * <br/>
  * @see MultiValueMap
  * @see LinkedMultiValueMap
  */
@@ -233,7 +242,7 @@ public class TemplateLearning {
 
         ParameterizedTypeReference<Map<String, Object>> parameterizedTypeReference =
                 new ParameterizedTypeReference<Map<String, Object>>() {
-        };
+                };
         /*
          * GET请求
          */

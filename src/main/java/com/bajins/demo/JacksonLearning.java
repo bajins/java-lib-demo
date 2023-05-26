@@ -113,6 +113,12 @@ public class JacksonLearning {
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.KEBAB_CASE);// 字段小写，多个单词以中横线-分隔
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE);// 字段小写，多个单词间无分隔符
 
+        System.out.println(new PropertyNamingStrategy.SnakeCaseStrategy().translate("userName")); // 驼峰转下划线
+        // 驼峰转下划线
+        PropertyNamingStrategy.UpperCamelCaseStrategy upperCamelCaseStrategy =
+                new PropertyNamingStrategy.UpperCamelCaseStrategy();
+        System.out.println(upperCamelCaseStrategy.translate("user_Name").replaceAll("_", ""));
+
         /*SimpleFilterProvider filterProvider = new SimpleFilterProvider();
         // Person类的属性过滤器（只序列化car,house,name字段）
         filterProvider.addFilter("person", SimpleBeanPropertyFilter.filterOutAllExcept(Sets.newHashSet("car",

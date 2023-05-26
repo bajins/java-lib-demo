@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.tuple.*;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.WordUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * @see ComparatorChain 多元素排序
  * @see BeanComparator 实现自然排序（根据ASCII码排序）
  * @see FixedOrderComparator 指定排序规则
- * @see SerializationUtils 指定排序规则
+ * @see SerializationUtils 序列化，深拷贝对象
  * @see IOUtils
  * @see ImmutablePair
  * @see ImmutableTriple
@@ -103,6 +104,13 @@ public class CommonsLang3 {
         // 首字母大小写转换
         StringUtils.capitalize("cat");// "Cat"
         StringUtils.uncapitalize("Cat");// "cat"
+
+        // 驼峰转下划线
+        //String str = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase("userName"), "_").toLowerCase();
+        String underscoreCase = StringUtils.uncapitalize("userName").replaceAll("([A-Z])", "_$1").toLowerCase();
+        System.out.println(underscoreCase);
+
+        System.out.println(WordUtils.capitalizeFully(underscoreCase, '_').replaceAll("_", ""));
 
         // 字符串扩充至指定大小且居中（若扩充大小少于原字符大小则返回原字符，若扩充大小为 负数则为0计算 ）
         StringUtils.center("abcd", 2);//  "abcd"

@@ -8,7 +8,10 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
-import redis.clients.jedis.*;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
 
@@ -514,6 +517,33 @@ public class JedisUtils {
     }
 
     public static void main(String[] args) {
+        /*try(Jedis jedis = jedisPool.getResource();) {
+            String script = """
+                local keys_ = redis.call('keys', KEYS[1]);
+                if(keys_ == nil or #keys_ == 0) then
+                    return nil;
+                end;
+                table.sort(keys_,
+                    function (a, b)
+                        if(a == nil or string.len(a) == 0) then
+                            return false;
+                        end;
+                        if(b == nil or string.len(b) == 0) then
+                            return false;
+                        end;
+                        local as = string.gsub(a, '.*:', '');
+                        local bs = string.gsub(b, '.*:', '');
+                            return a > b;
+                    end
+                );
+                return redis.call('get', keys_[1])
+                """;
+            byte[] value = (byte[]) jedis.eval(script, 1, "asd:*");
+            Map<?, ?> map = (Map<?, ?>) SerializationUtils.deserialize(value);
+
+            script = "local keys_ = redis.call('keys', KEYS[1]); retrun redis.call('get', unpack(keys_))";
+            List<?> values = (List<?>) jedis.eval(script, 1, "asd:*");
+        }*/
         /*try (Jedis jedis = jedisPool.getResource();) {
             Pipeline pipeline = jedis.pipelined();
             pipeline.select(1); // 使用第1个库

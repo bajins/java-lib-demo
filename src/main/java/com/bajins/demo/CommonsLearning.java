@@ -57,7 +57,8 @@ import java.util.List;
  * org.apache.commons.commons-io
  *
  * @see PropertyUtils 和BeanUtils不同在于：运行getProperty、setProperty操作时，没有类型转换，使用属性的原有类型或者包装类
- * @see BeanUtils
+ * @see BeanUtils 浅拷贝
+ * @see SerializationUtils 序列化，深拷贝
  * @see org.apache.commons.collections4
  */
 public class CommonsLearning {
@@ -93,11 +94,18 @@ public class CommonsLearning {
 
             /**
              * 对象拷贝
+             *
+             * 可以通过Java 序列化API进行深拷贝
+             * 也可以通过json工具序列化，把对象序列化成json字符串，然后再从字符串反序列化成对象，从而实现深拷贝
              */
             // No value specified for 'Date'：复制对象内存在Date类型的属性，但是Date没有初始值，因此需要提前设置初始值
             ConvertUtils.register(new DateConverter(null), java.util.Date.class);
-            //org.apache.commons.beanutils.BeanUtils.copyProperties();
+            //org.apache.commons.beanutils.BeanUtils.copyProperties(); // 浅拷贝
             //org.apache.commons.beanutils.PropertyUtils.copyProperties();
+            //BeanUtils.cloneBean()
+            //SerializationUtils.clone() 深拷贝
+            //SerializationUtils.serialize()
+            //SerializationUtils.deserialize()
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

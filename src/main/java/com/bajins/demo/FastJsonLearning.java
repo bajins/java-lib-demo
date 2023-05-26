@@ -2,12 +2,14 @@ package com.bajins.demo;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.JSONToken;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
-import com.alibaba.fastjson.serializer.*;
+import com.alibaba.fastjson.serializer.JSONSerializer;
+import com.alibaba.fastjson.serializer.NameFilter;
+import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -78,7 +80,7 @@ public class FastJsonLearning {
         String json = "{\"user_Name\":\"t\",\"age\":18}";
 
         ParserConfig parserConfig = new ParserConfig();
-        parserConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        //parserConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase; // Map、JSONObject、toJavaObject无效
         // 关闭智能匹配
         //Test test = JSON.parseObject(str, Test.class, parserConfig, Feature.DisableFieldSmartMatch);
         //test = object.toJavaObject(Test.class); // 智能匹配会失效
@@ -93,6 +95,7 @@ public class FastJsonLearning {
 
         // 序列化：驼峰转下划线
         SerializeConfig serializeConfig = new SerializeConfig();
+        //serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase; // Map、JSONObject、toJavaObject无效
         //serializeConfig.put(Map.class, new PascalNameSerializer());
         //serializeConfig.put(JSONObject.class, new PascalNameSerializer());
         serializeConfig.addFilter(Map.class, new UnderLineToCamelCaseNameFilter());
