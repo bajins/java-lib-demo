@@ -237,6 +237,23 @@
             <version>1.7</version>
         </dependency>
 
+        <!-- JDBC start -->
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.furyio</groupId>
+            <artifactId>fury-core</artifactId>
+            <version>0.1.0-alpha.1</version>
+        </dependency>
+        <!-- JDBC end -->
 
         <dependency>
             <groupId>com.google.guava</groupId>

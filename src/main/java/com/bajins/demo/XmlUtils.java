@@ -6,9 +6,17 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.springframework.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.util.StreamReaderDelegate;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -91,19 +99,19 @@ public class XmlUtils {
     // * @return
     // */
     //private static Map xml2map(Element e) {
-    //    Map map = new LinkedHashMap();
+    //    Map map = new LinkedHashMap<>();
     //    List list = e.elements();
     //    if (list.size() > 0) {
     //        for (int i = 0; i < list.size(); i++) {
     //            Element iter = (Element) list.get(i);
-    //            List mapList = new ArrayList();
+    //            List mapList = new ArrayList<>();
     //
     //            if (iter.elements().size() > 0) {
     //                Map m = xml2map(iter);
     //                if (map.get(iter.getName()) != null) {
     //                    Object obj = map.get(iter.getName());
     //                    if (!(obj instanceof List)) {
-    //                        mapList = new ArrayList();
+    //                        mapList = new ArrayList<>();
     //                        mapList.add(obj);
     //                        mapList.add(m);
     //                    }
@@ -154,14 +162,14 @@ public class XmlUtils {
     //
     //        for (int i = 0; i < list.size(); i++) {
     //            Element iter = list.get(i);
-    //            List mapList = new ArrayList();
+    //            List mapList = new ArrayList<>();
     //
     //            if (iter.elements().size() > 0) {
     //                Map m = xml2mapWithAttr(iter);
     //                if (map.get(iter.getName()) != null) {
     //                    Object obj = map.get(iter.getName());
     //                    if (!(obj instanceof List)) {
-    //                        mapList = new ArrayList();
+    //                        mapList = new ArrayList<>();
     //                        mapList.add(obj);
     //                        mapList.add(m);
     //                    }
@@ -188,7 +196,7 @@ public class XmlUtils {
     //                if (map.get(iter.getName()) != null) {
     //                    Object obj = map.get(iter.getName());
     //                    if (!(obj instanceof List)) {
-    //                        mapList = new ArrayList();
+    //                        mapList = new ArrayList<>();
     //                        mapList.add(obj);
     //                        // mapList.add(iter.getText());
     //                        if (hasAttributes) {
@@ -387,8 +395,8 @@ public class XmlUtils {
     //    }
     //    return xmlMap;
     //}
-
-
+    //
+    //
     //private static void recursionXmlToMap(Element element, Map<String, Object> outmap) {
     //    // 得到根元素下的子元素列表
     //    List<Element> list = element.elements();
@@ -468,5 +476,116 @@ public class XmlUtils {
         }
         return obj;
     }
+
+    /**
+     * 对象转XML
+     *
+     * @param obj
+     * @return
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public static <T> String bean2Xml(Object obj) throws JAXBException, IOException {
+        //import javax.xml.bind.JAXBContext;
+        //import javax.xml.bind.JAXBException;
+        //import javax.xml.bind.Marshaller;
+        //import javax.xml.bind.Unmarshaller;
+        // 实参中包含需要解析的类
+        JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
+        // javaBean序列化xml文件器
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        // 序列化后的xml是否需要格式化输出
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        // 取消这个标签的显示<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+        // 编码格式
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8);
+        // 序列化
+        try (StringWriter sw = new StringWriter();) {
+            marshaller.marshal(obj, sw);
+            return sw.toString();
+        }
+    }
+
+    /**
+     * XML反序列化为对象
+     *
+     * @param <T>
+     * @param xml
+     * @param clazz
+     * @return
+     * @throws JAXBException
+     * @throws UnsupportedEncodingException
+     * @throws IOException
+     * @throws FactoryConfigurationError
+     * @throws XMLStreamException
+     */
+    public static <T> T xml2Bean(String xml, Class<T> clazz) throws JAXBException, UnsupportedEncodingException,
+            IOException, FactoryConfigurationError, XMLStreamException {
+        //import javax.xml.bind.JAXBContext;
+        //import javax.xml.bind.JAXBException;
+        //import javax.xml.bind.Marshaller;
+        //import javax.xml.bind.Unmarshaller;
+        // 实参中包含需要解析的类
+        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        // xml文件解析成JavaBean对象器
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        try (InputStream is = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            // 序列化
+            //return unmarshaller.unmarshal(new ToLowerCaseNamesStreamReaderDelegate(xmlReader), clazz).getValue();
+            return unmarshaller.unmarshal(xmlReader, clazz).getValue();
+        }
+        /*try (StringReader reader = new StringReader(xml);) {
+            // 序列化
+            return unmarshaller.unmarshal(reader);
+        }*/
+    }
+
+    /**
+     * 自定义解析XML处理
+     */
+    private static class ToLowerCaseNamesStreamReaderDelegate extends StreamReaderDelegate {
+
+        public ToLowerCaseNamesStreamReaderDelegate(XMLStreamReader xsr) {
+            super(xsr);
+        }
+
+        @Override
+        public QName getAttributeName(int index) {
+            return super.getAttributeName(index);
+        }
+
+        @Override
+        public String getAttributeNamespace(int index) {
+            return super.getAttributeNamespace(index);
+        }
+
+        @Override
+        public String getAttributeLocalName(int index) { // 获取标签元素上的属性名称
+            return super.getAttributeLocalName(index);
+        }
+
+        @Override
+        public String getNamespacePrefix(int index) {
+            return super.getNamespacePrefix(index);
+        }
+
+        @Override
+        public QName getName() {
+            return super.getName();
+        }
+
+        @Override
+        public String getLocalName() { // 获取所有标签元素名称
+            return super.getLocalName().toLowerCase();
+        }
+
+        @Override
+        public Object getProperty(String name) {
+            return super.getProperty(name);
+        }
+    }
+
 
 }

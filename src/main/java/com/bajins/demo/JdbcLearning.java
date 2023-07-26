@@ -1,8 +1,13 @@
 package com.bajins.demo;
 
-public class SqlUtilsLearning {
+import java.sql.SQLException;
 
-    public static void main(String[] args) {
+/**
+ * https://blog.csdn.net/weixin_52341477/article/details/125604310
+ */
+public class JdbcLearning {
+
+    public static void main(String[] args) throws SQLException {
         // https://github.com/499636235/Druid-SqlParser/blob/main/src/Demo/Demo.java
         // 解析sql，生成 AST(抽象语法树)
         /*List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType);

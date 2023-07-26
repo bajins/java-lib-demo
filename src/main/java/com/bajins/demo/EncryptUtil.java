@@ -9,6 +9,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.Security;
 
@@ -257,6 +258,7 @@ public class EncryptUtil {
         // BASE64加密
         String s = Base64.encodeBase64String("str".getBytes());
         String s1 = Base64Utils.encodeToString("str".getBytes());
+        byte[] strs = DatatypeConverter.parseBase64Binary("str");
 
         // Base64编码
         byte[] bytes = Base64.encodeBase64("input".getBytes());
