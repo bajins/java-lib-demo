@@ -1,6 +1,7 @@
 package com.bajins.demo;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.JSONToken;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +33,7 @@ public class FastJsonLearning {
      * https://www.cnblogs.com/diegodu/p/5950057.html
      * https://blog.csdn.net/weixin_72984629/article/details/126852879
      * <p>
-     * Feature.DisableFieldSmartMatch 用于关闭下划线、大小写
+     * Feature.DisableFieldSmartMatch 用于关闭下划线、大小写 反序列化
      * PropertyNamingStrategy https://github.com/alibaba/fastjson/wiki/PropertyNamingStrategy_cn
      * SerializeFilterable 过滤器列表
      * AfterFilter
@@ -101,6 +103,8 @@ public class FastJsonLearning {
         serializeConfig.addFilter(Map.class, new UnderLineToCamelCaseNameFilter());
         serializeConfig.addFilter(JSONObject.class, new UnderLineToCamelCaseNameFilter());
         json = JSON.toJSONString(object, serializeConfig);
+        // 不启用jsonpath来解决循环依赖引用$ref
+        //json = JSON.toJSONString(object, SerializerFeature.DisableCircularReferenceDetect);
         System.out.println(json);
 
     }
@@ -158,6 +162,9 @@ public class FastJsonLearning {
     public static class PascalNameSerializer implements ObjectSerializer {
         @Override
         public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
+            if (!(object instanceof Map)) {
+                return;
+            }
             Map<String, Object> map = (Map<String, Object>) object;
             Map<String, Object> result = new HashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -193,6 +200,9 @@ public class FastJsonLearning {
     public static class PascalNameDeserializer implements ObjectDeserializer {
         @Override
         public Object deserialze(DefaultJSONParser parser, Type type, Object fieldName) {
+            /*if (!type.getTypeName().equals("Map")) {
+                return parser.parse(type);
+            }*/
             JSONObject jsonObject = new JSONObject();
             Map<String, Object> parse = (Map<String, Object>) parser.parse(type);
             for (Map.Entry<String, Object> entry : parse.entrySet()) {
@@ -224,6 +234,53 @@ public class FastJsonLearning {
         @Override
         public int getFastMatchToken() {
             return JSONToken.LBRACE;
+        }
+    }
+
+
+    /**
+     * JSONArray/JSONObject 下划线转驼峰
+     *
+     * @param json JSONArray/JSONObject
+     */
+    public static void convertNaming(Object json) {
+        if (json instanceof JSONArray arr) {
+            for (Object obj : arr) {
+                convertNaming(obj);
+            }
+        } else if (json instanceof JSONObject jo) {
+            Set<String> keys = jo.keySet();
+            String[] array = keys.toArray(new String[0]);
+            for (String key : array) {
+                Object value = jo.get(key);
+                String[] key_strs = key.split("_");
+                if (key_strs.length > 1) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < key_strs.length; i++) {
+                        String ks = key_strs[i];
+                        if (StringUtils.isBlank(ks)) {
+                            continue;
+                        }
+                        if (i == 0) {
+                            sb.append(ks);
+                        } else {
+                            int c = ks.charAt(0);
+                            if (c >= 97 && c <= 122) {
+                                int v = c - 32;
+                                sb.append((char) v);
+                                if (ks.length() > 1) {
+                                    sb.append(ks.substring(1));
+                                }
+                            } else {
+                                sb.append(ks);
+                            }
+                        }
+                    }
+                    jo.remove(key);
+                    jo.put(sb.toString(), value);
+                }
+                convertNaming(value);
+            }
         }
     }
 

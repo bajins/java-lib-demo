@@ -1,14 +1,18 @@
 package com.bajins.demo;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.context.support.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.validation.constraints.NotNull;
@@ -16,13 +20,22 @@ import javax.validation.constraints.NotNull;
 /**
  * 获取Spring上下文环境并获取其管理的Bean对象
  *
- * @see ApplicationContextAware
+ * @see BeanFactoryPostProcessor Spring应用上下文环境，获取Bean
+ * @see ConfigurableListableBeanFactory
+ * @see ApplicationContext https://www.cnblogs.com/pijunqi/p/14131648.html
+ * @see ConfigurableApplicationContext
+ * @see ContextLoader
+ * @see WebApplicationContext
+ * @see WebApplicationContextUtils
  * @see ClassPathXmlApplicationContext
  * @see FileSystemXmlApplicationContext
  * @see GenericApplicationContext
  * @see AnnotationConfigApplicationContext
  * @see StaticApplicationContext
  * @see XmlWebApplicationContext
+ * @see ApplicationContextAware
+ * @see ApplicationObjectSupport
+ * @see WebApplicationObjectSupport
  */
 @Component
 public class SpringAppContextUtils implements ApplicationContextAware {

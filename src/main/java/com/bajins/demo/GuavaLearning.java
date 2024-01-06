@@ -8,6 +8,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.List;
 import java.util.concurrent.*;
 
+
+/**
+ * @see StopWatch 计算执行时间差
+ */
 public class GuavaLearning {
     /**
      * 判断是否为驼峰

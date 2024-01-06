@@ -3,13 +3,8 @@ package com.bajins.demo;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.*;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.*;
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.NestedExceptionUtils;
@@ -32,14 +27,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.context.support.ServletContextResource;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.WebApplicationObjectSupport;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -73,6 +64,7 @@ import java.util.stream.Stream;
  * @see DigestUtils
  * @see SerializationUtils 序列化，深拷贝
  * @see StreamUtils
+ * @see StopWatch 计算执行时间差
  * <br/>
  * @see org.springframework.beans JavaBean相关操作
  * @see BeanUtils 浅拷贝
@@ -125,20 +117,6 @@ import java.util.stream.Stream;
  * @see DateTimeContextHolder
  * @see TransactionSynchronizationManager
  * @see LocaleContextHolder
- * @see ConfigurableListableBeanFactory Spring应用上下文环境
- * @see BeanFactoryPostProcessor
- * @see ApplicationContext https://www.cnblogs.com/pijunqi/p/14131648.html
- * @see WebApplicationContext
- * @see WebApplicationContextUtils
- * @see ClassPathXmlApplicationContext
- * @see FileSystemXmlApplicationContext
- * @see GenericApplicationContext
- * @see AnnotationConfigApplicationContext
- * @see StaticApplicationContext
- * @see XmlWebApplicationContext
- * @see ApplicationContextAware
- * @see ApplicationObjectSupport
- * @see WebApplicationObjectSupport
  * </br> Interceptor拦截器，基于Java的反射机制（动态代理）实现
  * <pre> 调用顺序：
  * HandlerInterceptor.preHandle -> RequestBodyAdvice.supports -> RequestBodyAdvice.beforeBodyRead ->
@@ -181,6 +159,7 @@ import java.util.stream.Stream;
  * @see org.springframework.scheduling.quartz
  * @see LocalTaskExecutorThreadPool
  * @see SimpleThreadPoolTaskExecutor Quartz的SimpleThreadPool类的子类，它会监听Spring的生命周期回调
+ * @see ApplicationEvent 
  */
 public class SpringUtilLearning {
 

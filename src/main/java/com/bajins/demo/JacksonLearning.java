@@ -44,19 +44,49 @@ public class JacksonLearning {
      */
     public static void main(String[] args) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        //这个特性，决定了解析器是否将自动关闭那些不属于parser自己的输入源。
+        // 如果禁止，则调用应用不得不分别去关闭那些被用来创建parser的基础输入流InputStream和reader；
+        //默认是true
+        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+        //是否允许解析使用Java/C++ 样式的注释（包括'/'+'*' 和'//' 变量）
+        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        //设置为true时，属性名称不带双引号
+        objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
+        //反序列化是是否允许属性名称不带双引号（可以进一步减小json体积）
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        //是否允许单引号来包住属性名称和字符串值
+        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        //是否允许JSON字符串包含非引号控制字符（值小于32的ASCII字符，包含制表符和换行符）
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        //是否允许JSON整数以多个0开始
+        objectMapper.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true);
+        //按字母顺序排序属性,默认false
+        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY,true);
+        //是否以类名作为根元素，可以通过@JsonRootName来自定义根元素名称,默认false
+        objectMapper.configure(SerializationFeature.WRAP_ROOT_VALUE,true);
+        //是否缩放排列输出,默认false
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT,false);
+        //序列化Date日期时以timestamps输出，默认true 取消时间的转化格式,默认是时间戳,可以取消,同时需要设置要表现的时间格式
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,true);
+        //序列化枚举是否以toString()来输出，默认false，即默认以name()来输出
+        objectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+        //序列化枚举是否以ordinal()来输出，默认false
+        objectMapper.configure(SerializationFeature.WRITE_ENUMS_USING_INDEX,false);
+        //序列化单元素数组时不以数组来输出，默认false
+        objectMapper.configure(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED,true);
+        //序列化Map时对key进行排序操作，默认false
+        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
+        //序列化char[]时以json数组输出，默认false
+        objectMapper.configure(SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS,true);
+        //序列化BigDecimal时是输出原始数字还是科学计数，默认false，即以toPlainString()科学计数方式来输出
+        objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN,true);
         // 排除json字符串中实体类没有的字段 @JsonIgnore
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // 允许出现特殊字符和转义符
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true); // 旧版本
         //objectMapper.configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(), true);
         // 序列化的时候序列对象的所有属性
         objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
         // 如果是空对象的时候,不抛异常
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // 属性为null的转换 @JsonInclude(value = Include.NON_NULL)
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        // 取消时间的转化格式,默认是时间戳,可以取消,同时需要设置要表现的时间格式
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         //GMT+8
         //map.put("CTT", "Asia/Shanghai");
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
@@ -74,27 +104,20 @@ public class JacksonLearning {
         objectMapper.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, false); // true忽略已被注册的 module
         objectMapper.registerModule(javaTimeModule); // 避免无效，先把IGNORE_DUPLICATE_MODULE_REGISTRATIONS设为false
         objectMapper.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, true);
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         // Include.NON_NULL 属性为NULL 不序列化
         // ALWAYS // 默认策略，任何情况都执行序列化
         // NON_EMPTY // null、集合数组等没有内容、空字符串等，都不会被序列化
         // NON_DEFAULT // 如果字段是默认值，就不会被序列化
         // NON_ABSENT // null的不会序列化，但如果类型是AtomicReference，依然会被序列化
+        // @JsonInclude(value = Include.NON_NULL)
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        // 允许字段名没有引号（可以进一步减小json体积）：
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        // 允许单引号：
-        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        // 允许C和C++样式注释：
-        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         // 序列化结果格式化，美化输出
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         // 枚举输出成字符串
-        // WRITE_ENUMS_USING_INDEX：输出索引
-        objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+        // 输出索引
+        objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_INDEX);
         //空对象不要抛出异常：
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         //Date、Calendar等序列化为时间格式的字符串(如果不执行以下设置，就会序列化成时间戳格式)：
@@ -194,12 +217,8 @@ public class JacksonLearning {
         xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         //xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        // 序列化是否绕根元素，true，则以类名为根元素
-        xmlMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
         xmlMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         xmlMapper.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        // 忽略空属性
-        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         // XML标签名:使用骆驼命名的属性名，
         xmlMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
         // 设置转换模式
