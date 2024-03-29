@@ -1,5 +1,7 @@
 package com.bajins.demo;
 
+import com.alibaba.fastjson.JSON;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 文件上传（含携带参数）：单文件、多文件、携带参数、分片上传、断点续传、追加上传、表单上传、流式上传
@@ -112,6 +115,25 @@ public class HttpFileUploadController {
         return String.join(",", paths);
     }
 
+    @RequestMapping({"/fileParam21"})
+    public String fileParam(HttpServletRequest request, HttpServletResponse response) {
+
+        CommonsMultipartResolver multipartResolver =
+                new CommonsMultipartResolver(request.getSession().getServletContext());
+        if (multipartResolver.isMultipart(request)) {
+            throw new IllegalArgumentException("消息主体无效!");
+        }
+        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+
+        Set<Map.Entry<String, MultipartFile>> entityMaps = multiRequest.getFileMap().entrySet();
+        for (Map.Entry<String, MultipartFile> entity : entityMaps) {
+            System.out.println(entity.getKey());
+        }
+        MultiValueMap<String, MultipartFile> multiFileMap = multiRequest.getMultiFileMap();
+
+        return "";
+    }
+
     /**
      * 上传同时携带参数，用在multipart/form-data表单提交请求的方法上
      * <p>
@@ -127,6 +149,20 @@ public class HttpFileUploadController {
     public String fileParam(@RequestPart @Valid final Map<String, Object> map,
                             @RequestPart("files") List<MultipartFile> files, HttpServletRequest request,
                             HttpServletResponse response) {
+        return map.toString();
+    }
+
+    @RequestMapping({"/fileParam4"})
+    public String fileParamJsonFile(@RequestParam("json") @Valid final String json,
+                                    @RequestParam("files") List<MultipartFile> files, HttpServletRequest request,
+                                    HttpServletResponse response) {
+        return JSON.parse(json).toString();
+    }
+
+    @RequestMapping({"/fileParam5"})
+    public String fileParamModelAttribute(@ModelAttribute @Valid final Map<String, Object> map,
+                                          @RequestParam("files") List<MultipartFile> files, HttpServletRequest request,
+                                          HttpServletResponse response) {
         return map.toString();
     }
 

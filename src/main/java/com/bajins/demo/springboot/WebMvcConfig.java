@@ -12,10 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.nio.charset.StandardCharsets;
@@ -33,10 +30,8 @@ import java.util.List;
  * <p>
  * 需要注意会覆盖application.properties中关于WebMvcAutoConfiguration的设置，需要在自定义配置中实现
  *
- * @author claer https://www.bajins.com
- * @program com.bajins.api.config
- * @description WebMvcConfig
- * @create 2019-05-22 14:25
+ * @see WebMvcConfigurer
+ * @see WebMvcConfigurerAdapter 过时
  * @see HttpServletRequestWrapper request增强器
  */
 @Configuration

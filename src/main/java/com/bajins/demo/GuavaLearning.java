@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 
 /**
- * @see StopWatch 计算执行时间差
+ * @see StopWatch 计算执行时间差（程序计时器）
  */
 public class GuavaLearning {
     /**

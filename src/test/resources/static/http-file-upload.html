@@ -53,7 +53,7 @@
             const formData = new FormData();
             // 所有字段都append进去
             formData.append('id', "id"); // 参数只接受字符串或文件，后端取值时不能自动转换为对象
-            // formData.append('id', new Blob([JSON.stringify(formm)], {type: 'application/json'}));
+            // formData.append('json', new Blob([JSON.stringify(formm)], {type: 'application/json'}));
             for (let i = 0; i < files.length; i++) {
                 let item = document.createElement("li");
                 item.innerHTML = files[i].webkitRelativePath;

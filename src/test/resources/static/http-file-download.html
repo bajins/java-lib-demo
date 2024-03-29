@@ -101,6 +101,10 @@
                             console.log(JSON.parse(enc.decode(new Uint8Array(buffer))));
                         });*/
                     } else if (xhr.response.type === 'application/octet-stream') {
+                        let filename = xhr.getResponseHeader("content-disposition").split(/filename=/i)[1].split(";")[0];
+                        filename = decodeURIComponent(filename);// 需要后端进行转义序列
+                        // filename = unescape(filename.replace(/\\/g, "%"));
+                        // filename = btoa(filename);
                         // 方式一
                         const reader = new FileReader();
                         // https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader/readAsArrayBuffer

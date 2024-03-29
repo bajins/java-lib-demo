@@ -253,6 +253,15 @@ public class TemplateLearning {
         URI uri = UriComponentsBuilder.fromHttpUrl("http://posturl").build(true).toUri();
         RequestEntity<Void> accept = RequestEntity.get(uri).header("Accept", type.toString()).build();
         ResponseEntity<Map<String, Object>> exchange1 = restTemplate.exchange(accept, parameterizedTypeReference);
+
+
+        // 上传表单参数（含文件）
+        MultiValueMap<String, String> map1 = new LinkedMultiValueMap<>();
+        map1.add("field1", "value1");
+        map1.add("field2", "value2");
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map1, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity("http://posturl", request, String.class);
     }
 
     /**

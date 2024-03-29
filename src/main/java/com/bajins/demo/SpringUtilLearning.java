@@ -4,6 +4,7 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.*;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;
@@ -35,6 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
@@ -54,7 +56,7 @@ import java.util.stream.Stream;
 
 /**
  * @see org.springframework.util
- * @see StringUtils 字符串工具类
+ * @see StringUtils 字符串工具类 https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/util/StringUtils.html
  * @see Assert 断言工具类
  * @see ReflectionUtils 反射工具类
  * @see AopProxyUtils
@@ -64,7 +66,7 @@ import java.util.stream.Stream;
  * @see DigestUtils
  * @see SerializationUtils 序列化，深拷贝
  * @see StreamUtils
- * @see StopWatch 计算执行时间差
+ * @see StopWatch 计算执行时间差（程序计时器）
  * <br/>
  * @see org.springframework.beans JavaBean相关操作
  * @see BeanUtils 浅拷贝
@@ -117,22 +119,24 @@ import java.util.stream.Stream;
  * @see DateTimeContextHolder
  * @see TransactionSynchronizationManager
  * @see LocaleContextHolder
- * </br> Interceptor拦截器，基于Java的反射机制（动态代理）实现
- * <pre> 调用顺序：
- * HandlerInterceptor.preHandle -> RequestBodyAdvice.supports -> RequestBodyAdvice.beforeBodyRead ->
- * RequestBodyAdvice.supports -> RequestBodyAdvice.afterBodyRead -> @RestController/@Controller ->
+ * <pre>{@code Spring框架调用顺序：
+ * 监听器(Listener/Event) -> 过滤器(Filter) -> 拦截器(Interceptor) -> AOP(Aspect-Oriented Programming).Aspect
+ *
+ * Filter.pre -> HandlerInterceptor.preHandle -> RequestBodyAdvice.supports -> RequestBodyAdvice.beforeBodyRead ->
+ * RequestBodyAdvice.supports -> RequestBodyAdvice.afterBodyRead -> @Aspect -> @RestController/@Controller -> @Aspect ->
  * ResponseBodyAdvice.supports -> ResponseBodyAdvice.beforeBodyWrite -> HandlerInterceptor.postHandle ->
- * HandlerInterceptor.afterCompletion
- * </pre>
- * @see HandlerInterceptor 请求地址拦截器，调用顺序：preHandle -> Contorller -> postHandle -> afterCompletion
+ * HandlerInterceptor.afterCompletion -> Filter.after
+ * }</pre>
+ * @see HandlerInterceptor 请求地址拦截器
  * @see AsyncHandlerInterceptor
+ * @see HandlerInterceptorAdapter 过时
  * @see HandlerExceptionResolver
  * @see HandlerMethodArgumentResolver
  * @see MethodInterceptor AOP项目中方法拦截器
  * @see LocaleChangeInterceptor
  * @see ThemeChangeInterceptor
  * @see WebRequestInterceptor
- * @see RequestBodyAdvice 配合@ControllerAdvice
+ * @see RequestBodyAdvice 配合@ControllerAdvice 拦截有@RequestBody注解作用的请求
  * @see ResponseBodyAdvice
  * </br> Filter 是Servlet过滤器，基于函数回调
  * @see Filter 过滤器 @ServletComponentScan @WebFilter @WebListener @WebServlet
@@ -159,7 +163,8 @@ import java.util.stream.Stream;
  * @see org.springframework.scheduling.quartz
  * @see LocalTaskExecutorThreadPool
  * @see SimpleThreadPoolTaskExecutor Quartz的SimpleThreadPool类的子类，它会监听Spring的生命周期回调
- * @see ApplicationEvent 
+ * @see ApplicationEvent
+ * @see ApplicationListener 监听器
  */
 public class SpringUtilLearning {
 

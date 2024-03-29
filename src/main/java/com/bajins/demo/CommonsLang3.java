@@ -22,6 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * @see StringUtils https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/StringUtils.html
  * @see DurationFormatUtils
  * @see FastDateFormat
  * @see ComparatorChain 多元素排序
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
  * @see MutableTriple
  * @see Pair
  * @see Triple
- * @see StopWatch 计算执行时间差
+ * @see StopWatch 计算执行时间差（程序计时器）
  */
 public class CommonsLang3 {
 

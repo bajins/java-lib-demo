@@ -28,8 +28,8 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -104,20 +104,12 @@ public class HttpClientApache {
                     contentType = ContentType.APPLICATION_JSON;
                 }
                 // 创建HttpEntity远程连接实例
-                HttpEntityEnclosingRequestBase httpEntity;
-                switch (method.toUpperCase()) {
-                    case "POST":
-                        httpEntity = new HttpPost(url);
-                        break;
-                    case "PATCH":
-                        httpEntity = new HttpPatch(url);
-                        break;
-                    case "PUT":
-                        httpEntity = new HttpPut(url);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + method.toUpperCase());
-                }
+                HttpEntityEnclosingRequestBase httpEntity = switch (method.toUpperCase()) {
+                    case "POST" -> new HttpPost(url);
+                    case "PATCH" -> new HttpPatch(url);
+                    case "PUT" -> new HttpPut(url);
+                    default -> throw new IllegalStateException("Unexpected value: " + method.toUpperCase());
+                };
                 // 为httpEntity实例设置配置
                 httpEntity.setConfig(requestConfig);
                 // setHeader(name, value)：如果Header中没有定义则添加，如果已定义则用新的value覆盖原用value值。
@@ -128,13 +120,11 @@ public class HttpClientApache {
                     httpEntity.setHeader("Authorization", authorization.trim());
                 }
                 // 封装post请求参数
-                if (null != params && params.size() > 0) {
+                if (null != params && !params.isEmpty()) {
                     if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
                         List<NameValuePair> nvps = new ArrayList<>();
                         // 通过map集成entrySet方法获取entity循环遍历，获取迭代器
-                        Iterator<Entry<String, Object>> iterator = params.entrySet().iterator();
-                        while (iterator.hasNext()) {
-                            Entry<String, Object> mapEntry = iterator.next();
+                        for (Entry<String, Object> mapEntry : params.entrySet()) {
                             nvps.add(new BasicNameValuePair(mapEntry.getKey(), mapEntry.getValue().toString()));
                         }
                         // 使用URL实体转换工具为httpEntity设置封装好的请求参数
@@ -145,16 +135,20 @@ public class HttpClientApache {
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                         // 把文件加到HTTP的post请求中
                         /*for (int i = 0; i < multipartFiles.size(); i++) {
-                            builder.addBinaryBody(fileParName, multipartFiles.get(i).getInputStream(),
+                            builder.addBinaryBody("files", multipartFiles.get(i).getInputStream(),
                                     ContentType.MULTIPART_FORM_DATA, multipartFile.getOriginalFilename());// 文件流
                         }
                         File f = new File("d:\test.text");
-                        builder.addBinaryBody("img", new FileInputStream(f), ContentType.APPLICATION_OCTET_STREAM
-                                , f.getName());*/
+                        builder.addBinaryBody("file", new FileInputStream(f), ContentType.APPLICATION_OCTET_STREAM
+                                , f.getName());
+                        builder.addPart("file2", new FileBody(f, ContentType.DEFAULT_BINARY));
+                        builder.addPart("file3", new StringBody("test", ContentType.TEXT_PLAIN));
+                        builder.addTextBody("bodyJson", bodyJson, ContentType.APPLICATION_JSON);*/
                         //决中文乱码
                         for (Entry<String, Object> entry : params.entrySet()) {
                             // 类似浏览器表单提交，对应input的name和value
-                            builder.addTextBody(entry.getKey(), entry.getValue().toString());
+                            builder.addTextBody(entry.getKey(), entry.getValue().toString()
+                                    , ContentType.create("text/plain", StandardCharsets.UTF_8));
                         }
                         // 使用URL实体转换工具为httpEntity设置封装好的请求参数
                         httpEntity.setEntity(builder.build());
@@ -185,26 +179,14 @@ public class HttpClientApache {
                 // 通过址默认配置创建一个httpClient实例
                 // httpClient = HttpClients.custom().setRetryHandler(myRetryHandler).build();
                 // 创建httpGet远程连接实例
-                HttpRequestBase httpRequestBase;
-                switch (method.toUpperCase()) {
-                    case "GET":
-                        httpRequestBase = new HttpGet(uriBuilder.build());
-                        break;
-                    case "DELETE":
-                        httpRequestBase = new HttpPatch(uriBuilder.build());
-                        break;
-                    case "HEAD":
-                        httpRequestBase = new HttpHead(uriBuilder.build());
-                        break;
-                    case "OPTIONS":
-                        httpRequestBase = new HttpOptions(uriBuilder.build());
-                        break;
-                    case "TRACE":
-                        httpRequestBase = new HttpTrace(uriBuilder.build());
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + method.toUpperCase());
-                }
+                HttpRequestBase httpRequestBase = switch (method.toUpperCase()) {
+                    case "GET" -> new HttpGet(uriBuilder.build());
+                    case "DELETE" -> new HttpPatch(uriBuilder.build());
+                    case "HEAD" -> new HttpHead(uriBuilder.build());
+                    case "OPTIONS" -> new HttpOptions(uriBuilder.build());
+                    case "TRACE" -> new HttpTrace(uriBuilder.build());
+                    default -> throw new IllegalStateException("Unexpected value: " + method.toUpperCase());
+                };
                 // 设置请求头信息，鉴权
                 // setHeader(name, value)：如果Header中没有定义则添加，如果已定义则用新的value覆盖原用value值。
                 // addHeader(name, value)：如果Header中没有定义则添加，如果已定义则保持原有value不改变。
