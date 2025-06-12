@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://tempuri.org/"
+           targetNamespace="http://tempuri.org/"
+           elementFormDefault="qualified">
+
+    <!-- Request elements -->
+    <xs:element name="Web_StartCheck_V2">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ResourceName" type="xs:string"/>
+                <xs:element name="LotSN" type="xs:string"/>
+                <xs:element name="SpecialCode" type="xs:string" minOccurs="0"/>
+                <xs:element name="TestSoft" type="xs:string"/>
+                <xs:element name="Operator" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Response elements -->
+    <xs:element name="WEB_StartCheck_V2Response">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- 注意这里，它是一个字符串，内部包含Root XML -->
+                <xs:element name="WEB_Web_StartCheck_V2" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--
+        虽然我们外部响应是字符串，但为了完善描述，可以在XSD中定义Root的结构
+        这仅仅是为WSDL提供更完整的类型信息，实际SOAP响应中，它仍然是字符串
+    -->
+    <xs:element name="Root">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="I_ReturnMessage" type="xs:string"/>
+                <xs:element name="TestResult" type="xs:string"/>
+                <xs:element name="Mac" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
