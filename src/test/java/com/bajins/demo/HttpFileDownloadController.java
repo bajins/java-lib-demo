@@ -19,10 +19,9 @@ import org.springframework.web.util.UriUtils;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
@@ -176,10 +175,14 @@ public class HttpFileDownloadController {
 
     /**
      * 用 HttpServletRequest 获取整个URL，然后使用Spring的 AntPathMatcher 工具来提取URL中的路径部分
-     *
+     *  http://www.enmalvi.com/2022/09/06/springmvc-pathpattern
+     *  https://qtdebug.com/spring-mvc-path-with-dot
+     * @see AntPathMatcher
+     * @see PathPattern https://blog.csdn.net/f641385712/article/details/118031407
      * @param request
      * @return
      */
+    // @GetMapping("/files/{*path}")
     @GetMapping("/files/**")
     public ResponseEntity<FileSystemResource> getFileContent(HttpServletRequest request) {
         String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -202,12 +205,57 @@ public class HttpFileDownloadController {
         //String filename = URLEncoder,encode(file.getName(), StandardCharsets.UTF_8.displaName());
         //String filename = StringEscapeUtils.escapeEcmaScript(file.getName());
         //String filename = Base64.getEncoder().encodeToString(file.getName().getBytes());
-        headers.add("Content-Disposition",
-                "attachment; filename=" + filename);
+        headers.add("Content-Disposition", "attachment; filename=" + filename);
         return ResponseEntity.ok()//
                 .headers(headers)//
                 .contentLength(file.length())//
                 .contentType(MediaType.parseMediaType("application/octet-stream"))//
                 .body(new FileSystemResource(file));
+    }
+
+
+    /**
+     * 下载远程文件
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping({"/f5"})
+    public void downloadUrlfile(HttpServletRequest request,
+                                HttpServletResponse response) {
+        String fileUrl = request.getParameter("fileUrl");
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            URL url = new URL(fileUrl);
+            URLConnection connection = url.openConnection();
+            inputStream = connection.getInputStream();
+
+            response.setHeader("Content-Disposition", "attachment; filename=\"downloaded_file.txt\"");
+            response.setHeader("Content-Type", "text/plain");
+            response.setHeader("Content-Length", String.valueOf(connection.getContentLength()));
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            outputStream = response.getOutputStream();
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+
+        } finally {
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

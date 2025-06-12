@@ -5,45 +5,177 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.springframework.util.StringUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.*;
+import javax.xml.soap.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
+import javax.xml.transform.TransformerConfigurationException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * https://stackoverflow.com/questions/1537207/how-to-convert-xml-to-java-util-map-and-vice-versa
  */
 public class XmlUtils {
 
-    //public static void main(String[] args) throws DocumentException, IOException {
-    //    String textFromFile = FileUtils.readFileToString(new File("ehcache3.xml"), "UTF-8");
-    //    Map<String, Object> map = xml2map(textFromFile, false);
-    //    // long begin = System.currentTimeMillis();
-    //    // for(int i=0; i<1000; i++){
-    //    // map = (Map<String, Object>) xml2mapWithAttr(doc.getRootElement());
-    //    // }
-    //    // System.out.println("耗时:"+(System.currentTimeMillis()-begin));
-    //    JSON json = JSONObject.fromObject(map);
-    //    System.out.println(json.toString(1)); // 格式化输出
-    //
-    //    Document doc = map2xml(map, "root");
-    //    //Document doc = map2xml(map); //map中含有根节点的键
-    //    System.out.println(formatXml(doc));
-    //}
-    //
+    public static void main(String[] args) throws IOException, ParserConfigurationException,
+            SAXException, XMLStreamException, JAXBException, SOAPException, TransformerConfigurationException {
+        /*String textFromFile = FileUtils.readFileToString(new File("ehcache3.xml"), "UTF-8");
+        Map<String, Object> map = xml2map(textFromFile, false);
+        // long begin = System.currentTimeMillis();
+        // for(int i=0; i<1000; i++){
+        // map = (Map<String, Object>) xml2mapWithAttr(doc.getRootElement());
+        // }
+        // System.out.println("耗时:"+(System.currentTimeMillis()-begin));
+        JSON json = JSONObject.fromObject(map);
+        System.out.println(json.toString()); // 格式化输出
+
+        Document doc = map2xml(map, "root");
+        //Document doc = map2xml(map); //map中含有根节点的键
+        System.out.println(formatXml(doc));*/
+
+        String xml = "<xml><ToUserName><![CDATA[toUser]]></ToUserName><FromUserName><![CDATA[fromUser" +
+                "]]></FromUserName" +
+                "><CreateTime>1348831860</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[this is a " +
+                "test]]></Content><MsgId>1234567890123456</MsgId></xml>";
+        StringReader reader = new StringReader(xml);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+        /*
+         * 解析XML方式一
+         */
+        // 创建 DocumentBuilderFactory
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // 创建 DocumentBuilder
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        // 解析 XML为 Document 对象
+        org.w3c.dom.Document doc = builder.parse(inputStream);
+
+        /*
+         * 解析XML方式二
+         */
+        XMLInputFactory factory1 = XMLInputFactory.newInstance();
+        XMLStreamReader reader1 = factory1.createXMLStreamReader(inputStream);
+        while (reader1.hasNext()) {
+            int event = reader1.next();
+            if (event == XMLStreamReader.START_ELEMENT) {
+                String name = reader1.getLocalName();
+                String value = reader1.getElementText();
+                System.out.println(name + ":" + value);
+            }
+        }
+
+        /*
+         * 解析XML方式三
+         */
+        JAXBContext jaxbContext = JAXBContext.newInstance();
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        Object response = unmarshaller.unmarshal(reader);
+
+        /*
+         * 解析XML方式四
+         */
+        /*SAXReader saxReader = new SAXReader();
+        Document dc = saxReader.read(reader);
+        Element root = dc.getRootElement();*/
+
+        /*
+         * 解析XML方式五
+         */
+        // 创建一个SAXParserFactory对象
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        // 创建一个SAXParser对象
+        SAXParser parser = saxParserFactory.newSAXParser();
+        // 创建一个自定义的DefaultHandler对象
+        DefaultHandler handler = new DefaultHandler() {
+            boolean isElement = false;
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes attributes)
+                    throws SAXException {
+                isElement = true;
+            }
+
+            @Override
+            public void characters(char[] ch, int start, int length) throws SAXException {
+                if (isElement) {
+                    String value = new String(ch, start, length);
+                    System.out.println(value);
+                    isElement = false;
+                }
+            }
+        };
+        //解析XML数据流,通过回调函数触发相应的事件
+        parser.parse(inputStream, handler);
+
+        /*
+         * 解析XML方式六
+         */
+        // 创建 XPath 对象
+        /*XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
+        // 构建 XPath 表达式
+        String expression = "//elementName[@attributeName='attributeValue']";
+        // 执行 XPath 表达式
+        NodeList nodeList = (NodeList) xpath.evaluate(expression, xml, XPathConstants.NODESET);*/
+
+        /*
+         * 解析 SOAP XML方式一
+         */
+        // 创建 MessageFactory
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        //MimeHeaders headers = new MimeHeaders();
+        // 从输入流创建 SOAPMessage
+        SOAPMessage soapMessage = messageFactory.createMessage(null, inputStream);
+        // 获取 SOAP Body
+        SOAPBody body = soapMessage.getSOAPBody();
+        System.out.println(body.getTextContent());
+
+        // 打印SOAP消息的内容
+        soapMessage.writeTo(System.out);
+        // 从SOAPMessage中提取SOAPPart
+        SOAPPart soapPart = soapMessage.getSOAPPart();
+        // 获取SOAPEnvelope
+        SOAPEnvelope envelope = soapPart.getEnvelope();
+        // 获取SOAPBody
+        SOAPBody soapBody = envelope.getBody();
+
+        // 遍历所有的直接节点
+        for (Iterator<?> it = soapBody.getChildElements(); it.hasNext(); ) {
+            SOAPElement element = (SOAPElement) it.next();
+            System.out.println(element.getElementName().getLocalName());
+            // 如果需要，可以继续遍历子节点
+        }
+        /*
+        // 请求连接
+        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+        SOAPConnection connection = soapConnectionFactory.createConnection();
+        envelope.addNamespaceDeclaration("ns", "http://service.medc.com/");
+        SOAPElement bodyElement = body.addChildElement(soapMethod, "ns");
+        //方法传参
+        bodyElement.addChildElement(idType).addTextNode(id);
+        //响应获取
+        connection.call(soapMessage, url);*/
+
+        /*
+        // 返回xml数据
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(source, new StreamResult(writer));*/
+    }
+
     ///**
     // * xml转map 不带属性
     // *

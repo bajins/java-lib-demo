@@ -352,8 +352,9 @@ public class ExcelUtils {
                     mConvertInstanceCache.put(clazz, export);
                 }
 
-                if (mConvertInstanceCache.size() > 10)
+                if (mConvertInstanceCache.size() > 10) {
                     mConvertInstanceCache.clear();
+                }
 
                 return export.handler(oldValue);
             }

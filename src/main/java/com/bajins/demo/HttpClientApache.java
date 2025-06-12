@@ -167,6 +167,19 @@ public class HttpClientApache {
                                 contentType.getCharset()));
                     }
                 }
+                /*
+                 String auth = Base64.getEncoder().encodeToString("username:pwd".getBytes(StandardCharsets.UTF_8));
+                 httpEntity.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + auth);
+                */
+                /*
+                // 设置认证信息
+                CredentialsProvider cp = new BasicCredentialsProvider();
+                cp.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("username", "pwd"));
+                // 创建httpClient上下文对象
+                HttpClientContext context = new HttpClientContext();
+                context.setCredentialsProvider(cp);
+                response = httpClient.execute(httpEntity, context);
+                */
                 // httpClient对象执行post请求,并返回响应参数对象
                 response = httpClient.execute(httpEntity);
             } else {

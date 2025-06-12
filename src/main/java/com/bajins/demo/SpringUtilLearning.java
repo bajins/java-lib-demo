@@ -117,7 +117,6 @@ import java.util.stream.Stream;
  * @see RequestContextHolder 子线程获取RequestAttributes https://blog.csdn.net/qq_25775675/article/details/125617310
  * @see RequestContextUtils
  * @see DateTimeContextHolder
- * @see TransactionSynchronizationManager
  * @see LocaleContextHolder
  * <pre>{@code Spring框架调用顺序：
  * 监听器(Listener/Event) -> 过滤器(Filter) -> 拦截器(Interceptor) -> AOP(Aspect-Oriented Programming).Aspect
@@ -128,6 +127,13 @@ import java.util.stream.Stream;
  * HandlerInterceptor.afterCompletion -> Filter.after
  * }</pre>
  * @see HandlerInterceptor 请求地址拦截器
+ * <pre>{@code 应用场景
+ * 权限检查: 在请求到达具体处理方法前验证用户是否登录或拥有访问特定资源的权限。
+ * 日志记录: 记录请求的相关信息，如请求时间、URL、请求参数等，用于审计或性能监控。
+ * 请求参数预处理: 对请求参数进行统一处理或格式校验，如字符编码转换、参数合法性验证等。
+ * 多租户处理: 根据请求中的租户信息切换数据源或设置线程局部变量，实现多租户支持。
+ * 性能监控: 开始计时，用于计算请求处理的总耗时。
+ * }</pre>
  * @see AsyncHandlerInterceptor
  * @see HandlerInterceptorAdapter 过时
  * @see HandlerExceptionResolver
@@ -244,5 +250,6 @@ public class SpringUtilLearning {
         ThreadFactory springThreadFactory = new CustomizableThreadFactory("springThread-pool-");
         ExecutorService exec = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(10), springThreadFactory);
+
     }
 }

@@ -11,9 +11,9 @@ public class TimeConvert implements ExportConvert {
     @Override
     public String handler(Object val) {
         try {
-            if (val == null)
+            if (val == null) {
                 return "";
-            else {
+            } else {
                 return Time7Util.getDateFormat(val.toString(), "yyyy-MM-dd HH:mm:ss");
             }
         } catch (Exception e) {

@@ -1,11 +1,14 @@
 package com.bajins.demo;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.*;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
+import org.springframework.context.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.*;
 import org.springframework.stereotype.Component;
@@ -20,8 +23,17 @@ import javax.validation.constraints.NotNull;
 /**
  * 获取Spring上下文环境并获取其管理的Bean对象
  *
+ * @see InitializingBean 
+ * @see BeanPostProcessor Bean后置处理器
+ * @see InstantiationAwareBeanPostProcessor
+ * @see InstantiationAwareBeanPostProcessorAdapter
+ * @see SmartInstantiationAwareBeanPostProcessor
+ * @see MergedBeanDefinitionPostProcessor
+ * @see DestructionAwareBeanPostProcessor
  * @see BeanFactoryPostProcessor Spring应用上下文环境，获取Bean
+ * @see BeanDefinitionRegistryPostProcessor 
  * @see ConfigurableListableBeanFactory
+ * @see AbstractApplicationContext https://blog.csdn.net/qq_38257958/article/details/134753005
  * @see ApplicationContext https://www.cnblogs.com/pijunqi/p/14131648.html
  * @see ConfigurableApplicationContext
  * @see ContextLoader
@@ -33,9 +45,16 @@ import javax.validation.constraints.NotNull;
  * @see AnnotationConfigApplicationContext
  * @see StaticApplicationContext
  * @see XmlWebApplicationContext
+ * @see ApplicationContextAwareProcessor Bean后置处理器
  * @see ApplicationContextAware
  * @see ApplicationObjectSupport
  * @see WebApplicationObjectSupport
+ * @see BeanNameAware
+ * @see BeanFactoryAware
+ * @see BeanClassLoaderAware
+ * @see EmbeddedValueResolverAware
+ * @see EnvironmentAware
+ * @see MessageSourceAware
  */
 @Component
 public class SpringAppContextUtils implements ApplicationContextAware {

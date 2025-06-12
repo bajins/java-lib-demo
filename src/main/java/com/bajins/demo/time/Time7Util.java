@@ -1367,7 +1367,7 @@ public class Time7Util {
      */
     public static String getHowLong(Date date) {
         long now = new Date().getTime();
-        long s = 1000l;
+        long s = 1000L;
         long m = s * 60;
         long h = m * 60;
         long d = h * 24;

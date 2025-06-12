@@ -30,6 +30,26 @@ import java.util.List;
 
 
 /**
+ * Lang: 提供对 Java 核心类的扩展，例如字符串操作、数组操作、反射、并发等。
+ * Collections: 扩展 Java 集合框架，提供更丰富的集合类型和实用工具。
+ * IO: 简化输入/输出操作，例如文件读写、网络通信等。
+ * Math: 提供数学和统计计算功能。
+ * BeanUtils: 简化 Java Bean 操作，例如属性复制、属性访问等。
+ * CLI: 创建命令行界面。
+ * Codec: 提供编码和解码功能，例如 Base64、URL 编码等。
+ * Compress: 支持压缩和解压缩文件，例如 ZIP、GZIP 等。
+ * Configuration: 读取和操作配置文件。
+ * DBCP: 提供数据库连接池。
+ * Email: 发送电子邮件。
+ * FileUpload: 处理文件上传。
+ * HttpClient: 执行 HTTP 请求。
+ * Imaging: 处理图像。
+ * Logging: 提供日志记录功能。
+ * Net: 提供网络编程工具。
+ * Pool: 提供对象池。
+ * Validator: 验证数据。
+ * CSV: 提供CSV文件的读写工具，简化了逗号分隔值文件的处理过程。
+ * <p>
  * commons-beanutils:commons-beanutils
  * commons-codec:commons-codec
  * commons-collections:commons-collections

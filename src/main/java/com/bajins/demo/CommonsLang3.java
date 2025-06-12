@@ -192,6 +192,16 @@ public class CommonsLang3 {
         StringUtils.lowerCase("aBc");// "abc"
         StringUtils.swapCase("The dog has a BONE");// "tHE DOG HAS A bone"
 
+        // 将蛇形字符串转换为小驼峰字符串
+        String camelCaseString = StringUtils.capitalize(StringUtils.join(
+                StringUtils.splitByCharacterTypeCamelCase("snake_case_string".replace("_", " ")),
+                ""
+        ));
+        // 将小驼峰字符串的首字母大写，转换为大驼峰字符串
+        camelCaseString = StringUtils.capitalize(camelCaseString);
+        // 大驼峰转小驼峰字符串
+        camelCaseString = StringUtils.uncapitalize(camelCaseString);
+
         // 替换字符串内容……（replacePattern、replceOnce）
         StringUtils.replace("aba", "a", "z");// "zbz"
         StringUtils.overlay("abcdef", "zz", 2, 4);// "abzzef"(指定区域)

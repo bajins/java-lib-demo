@@ -1,14 +1,18 @@
 package com.bajins.demo;
 
 import com.alibaba.fastjson.JSON;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.*;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -39,6 +43,13 @@ import java.util.Set;
 @RestController
 @RequestMapping("/upload")
 public class HttpFileUploadController {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+    @Autowired
+    private ServletContext servletContext;
+    @Autowired
+    private WebApplicationContext context;
 
     /**
      * 上传同时携带参数，指定 from 表单属性 enctype="multipart/form-data"
@@ -80,6 +91,20 @@ public class HttpFileUploadController {
         //request.getFileMap()
         //request.getMultiFileMap()
         List<MultipartFile> files = request.getFiles("files"); // 文件列表
+
+
+        // 获取本地静态文件
+        /*String path_temp = "common/img/user_head_img.png";
+        ClassPathResource resource = new ClassPathResource(path_temp); // 获取类路径下的文件
+        System.out.println(resource.getPath());
+        FileSystemResource resource1 = new FileSystemResource(path_temp);
+        System.out.println(resource1.getPath());
+        String filePath0 = servletContext.getRealPath("/" + path_temp);
+        System.out.println(filePath0);
+        String filePath1 = context.getServletContext().getRealPath("/" + path_temp);
+        System.out.println(filePath1);
+        Resource resource2 = resourceLoader.getResource(path_temp);
+        System.out.println(resource2);*/
 
         String filePath = "D:\\Download\\file\\";
         List<String> paths = new ArrayList<>();

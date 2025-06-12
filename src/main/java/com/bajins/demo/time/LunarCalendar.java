@@ -98,8 +98,9 @@ public class LunarCalendar {
      * @param date 指定日期对象
      */
     public LunarCalendar(Date date) {
-        if (date == null)
+        if (date == null) {
             date = new Date();
+        }
         this.init(date.getTime());
     }
 
@@ -256,10 +257,12 @@ public class LunarCalendar {
         if (lunarMonth == 1) {
             lunarMonthString = LunarCalendar.lunarString2[4];
         } else {
-            if (lunarMonth > 9)
+            if (lunarMonth > 9) {
                 lunarMonthString += LunarCalendar.lunarString2[1];
-            if (lunarMonth % 10 > 0)
+            }
+            if (lunarMonth % 10 > 0) {
                 lunarMonthString += LunarCalendar.lunarString1[lunarMonth % 10];
+            }
         }
         return lunarMonthString;
     }
@@ -271,16 +274,19 @@ public class LunarCalendar {
      * @return 农历日字符串 (例: 廿一)
      */
     private static String getLunarDayString(int lunarDay) {
-        if (lunarDay < 1 || lunarDay > 30)
+        if (lunarDay < 1 || lunarDay > 30) {
             return "";
+        }
         int i1 = lunarDay / 10;
         int i2 = lunarDay % 10;
         String c1 = LunarCalendar.lunarString2[i1];
         String c2 = LunarCalendar.lunarString1[i2];
-        if (lunarDay < 11)
+        if (lunarDay < 11) {
             c1 = LunarCalendar.lunarString2[0];
-        if (i2 == 0)
+        }
+        if (i2 == 0) {
             c2 = LunarCalendar.lunarString2[1];
+        }
         return c1 + c2;
     }
 
@@ -290,8 +296,9 @@ public class LunarCalendar {
      * @return 农历年生肖(例 : 龙)
      */
     public String getAnimalString() {
-        if (lunarYear == 0)
+        if (lunarYear == 0) {
             return null;
+        }
         return LunarCalendar.Animals[(this.lunarYear - 4) % 12];
     }
 
@@ -301,8 +308,9 @@ public class LunarCalendar {
      * @return 农历日期字符串
      */
     public String getDayString() {
-        if (lunarDay == 0)
+        if (lunarDay == 0) {
             return null;
+        }
         return LunarCalendar.getLunarDayString(this.lunarDay);
     }
 
@@ -326,8 +334,9 @@ public class LunarCalendar {
      * @return 农历日期字符串
      */
     public String getYearString() {
-        if (lunarYear == 0)
+        if (lunarYear == 0) {
             return null;
+        }
         return LunarCalendar.getLunarYearString(this.lunarYear);
     }
 
@@ -382,8 +391,9 @@ public class LunarCalendar {
      * @return 天数
      */
     public int getMaxDayInMonth() {
-        if (lunarYear == 0)
+        if (lunarYear == 0) {
             return 0;
+        }
         return this.maxDayInMonth;
     }
 

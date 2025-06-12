@@ -28,10 +28,12 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.*;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -40,6 +42,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -80,11 +83,34 @@ import java.util.regex.Pattern;
  * @see ResourceTransactionManager
  * @see DataSourceTransactionManager
  * @see TransactionAwareDataSourceProxy
+ * @see TransactionSynchronizationManager
+ * @see TransactionSynchronization
+ * @see TransactionAspectSupport
+ * @see TransactionCallbackWithoutResult
  * <br/>
  * @see MultiValueMap
  * @see LinkedMultiValueMap
  */
 public class TemplateLearning {
+
+    private JdbcTemplate jdbcTemplate;
+
+    @PostConstruct
+    public void init() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/your_database_name");
+        dataSource.setUsername("your_username");
+        dataSource.setPassword("your_password");
+
+        /*DataSource dataSource = DataSourceBuilder.create()
+                .driverClassName("oracle.jdbc.OracleDriver")
+                .url("jdbc:oracle:thin:@//localhost:1521/ORCL")
+                .username("your_username")
+                .password("your_password")
+                .build();*/
+        this.jdbcTemplate = new JdbcTemplate(dataSource); // 使用JdbcTemplate连接第三方数据库
+    }
 
     /**
      * 自定义渲染模板
@@ -458,18 +484,73 @@ public class TemplateLearning {
 
 
     /**
-     * RowMapper：用于将结果集每行数据转换为需要的类型，用户需实现方法mapRow(ResultSet rs, int rowNum)来完成将每行数据转换为相应的类型。
+     * ResultSetExtractor：用于处理整个 ResultSet，即一次性处理所有行，需要自行调用ResultSet的next()方法。
+     * RowMapper：用于逐行处理 ResultSet，每次处理一行数据。不需要调用ResultSet的next()方法，会调用RowMapperResultSetExtractor的extractData()方法默认实现。
      * BeanPropertyRowMapper
      * ParameterizedBeanPropertyRowMapper
      * ColumnMapRowMapper
-     * SingleColumnRowMapper
-     * RowCallbackHandler：用于处理ResultSet的每一行结果，用户需实现方法processRow(ResultSet rs)来完成处理，
-     * 在该回调方法中无需执行rs.next()，该操作由JdbcTemplate来执行，用户只需按行获取数据然后处理即可。
-     * ResultSetExtractor：用于结果集数据提取，用户需实现方法extractData(ResultSet rs)来处理结果集，用户必须处理整个结果集。
+     * SingleColumnRowMapper 适用于查询结果只有一列，且你只想获取该列的值，而不需要将其封装到自定义对象中的场景
+     * RowCallbackHandler：用于处理ResultSet的每一行结果集，并不返回任何值。不需要调用ResultSet的next()方法。
+     * KeyValueRowMapper：用于将结果集中的每一行映射到一个Map对象，其中Map的key为列名，value为列值。
+     * AggregationRowMapper：用于聚合查询结果集，将结果集中的每一行映射到一个对象，并对其进行聚合。
+     * SqlRowSetRowMapper：用于将SqlRowSet结果集映射到一个对象。
      * PreparedStatement
      * BatchPreparedStatementSetter
      */
     public void jdbcTemplate() {
+        // sql求和
+        /*BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<BigDecimal>() {
+            @Override
+            public BigDecimal extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (!rs.next()) { // 调用一次next()方法，初始状态下使游标指向第一行，且判断是否有数据
+                    return BigDecimal.ZERO;
+                }
+                BigDecimal bigDecimal = rs.getBigDecimal(1);
+                return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
+            }
+        });
+        BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, (rs) -> {
+            if (!rs.next()) { // 调用一次next()方法，初始状态下使游标指向第一行，且判断是否有数据
+                return BigDecimal.ZERO;
+            }
+            BigDecimal bigDecimal = rs.getBigDecimal(1);
+            return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
+        });
+        Date currentTime = erpJdbcTemplate.query("SELECT CURRENT_TIMESTAMP FROM DUAL", (rs) -> {
+            if (!rs.next()) { // 调用一次next()方法，初始状态下使游标指向第一行，且判断是否有数据
+                return null;
+            }
+            return rs.getTimestamp(1);
+        });
+        */
+
+        /*
+        Map<String, Object> configMap = jdbcTemplate.query(sql, new ResultSetExtractor<Map<String, Object>>() {
+            @Override
+            public Map<String, Object> extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (!rs.next()) { // 调用一次next()方法，初始状态下使游标指向第一行，且判断是否有数据
+                    return null;
+                }
+                Map<String, Object> resultMap = new HashMap<>();
+                // 获取结果集的元数据
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                // 遍历每一列
+                for (int i = 1; i <= columnCount; i++) {
+                    // 获取列名和列值
+                    String columnName = metaData.getColumnLabel(i).toLowerCase();
+                    Object columnValue = rs.getObject(i);
+                    // 将列名和列值添加到 Map 中
+                    resultMap.put(JdbcUtils.convertUnderscoreNameToPropertyName(columnName), columnValue);
+                }
+                if (MapUtils.isEmpty(resultMap)) {
+                    return null;
+                }
+                return resultMap;
+            }
+        }, configCode);
+         */
+
         //List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql, new Object[]{id}); // 字段为下划线大写风格
         /*
         List<Map<String, Object>> mapList = jdbcTemplate.query(sql, new Object[]{id},
@@ -480,7 +561,7 @@ public class TemplateLearning {
                     int columnCount = rsmd.getColumnCount();
                     Map<String, Object> mapOfColValues = new LinkedCaseInsensitiveMap<Object>(columnCount);
                     for (int i = 1; i <= columnCount; i++) {
-                        String key = JdbcUtils.lookupColumnName(rsmd, i);
+                        String key = JdbcUtils.lookupColumnName(rsmd, i).toLowerCase();
                         key = JdbcUtils.convertUnderscoreNameToPropertyName(key); // 下划线转驼峰
                         Object obj = JdbcUtils.getResultSetValue(rs, i);
                         mapOfColValues.put(key, obj);
@@ -491,30 +572,9 @@ public class TemplateLearning {
 
         /*List<TestDto> testDtos = jdbcTemplate.query(mlSql, new Object[] { id },
                 BeanPropertyRowMapper.newInstance(TestDto.class));*/
-        // sql求和
-        /*BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, new ResultSetExtractor<BigDecimal>() {
-            @Override
-            public BigDecimal extractData(ResultSet rs) throws SQLException, DataAccessException {
-                if (!rs.next()) {
-                    return BigDecimal.ZERO;
-                }
-                BigDecimal bigDecimal = rs.getBigDecimal(1);
-                return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
-            }
-        });*/
-        /*BigDecimal uploadQty = jdbcTemplate.query(sql, new Object[] { id }, (rs) -> {
-            if (!rs.next()) {
-                return BigDecimal.ZERO;
-            }
-            BigDecimal bigDecimal = rs.getBigDecimal(1);
-            return bigDecimal != null ? bigDecimal : BigDecimal.ZERO;
-        });*/
         /*List<TestDto> query = jdbcTemplate.query(mlSql, new Object[] { moId }, new RowMapper<TestDto>() {
             @Override
             public TestDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-                if (!rs.next()) {
-                    return null;
-                }
                 BigDecimal qty = rs.getBigDecimal("qty") != null ? rs.getBigDecimal("qty")
                         : BigDecimal.ZERO;
                 TestDto testDto = new TestDto();

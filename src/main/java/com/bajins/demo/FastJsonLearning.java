@@ -3,20 +3,19 @@ package com.bajins.demo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.JSONToken;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.NameFilter;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
-import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,8 +46,11 @@ public class FastJsonLearning {
      * SerializeFilter 序列化过滤器
      * SimplePropertyPreFilter
      * ValueFilter
+     * <p>
      * SerializerFeature 序列化属性 https://blog.csdn.net/qq_45441466/article/details/110393204
      * SerializeConfig 序列化时的配置
+     * ObjectSerializer
+     * ObjectDeserializer
      *
      * @param args
      */
@@ -78,6 +80,9 @@ public class FastJsonLearning {
         fastJsonConfig.setCharset(StandardCharsets.UTF_8);
         // 在转换器中添加配置信息
         fastConverter.setFastJsonConfig(fastJsonConfig);
+        
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.configNullAsEmpty(true); // 将null转换为空字符串输出
         */
         String json = "{\"user_Name\":\"t\",\"age\":18}";
 
@@ -102,11 +107,26 @@ public class FastJsonLearning {
         //serializeConfig.put(JSONObject.class, new PascalNameSerializer());
         serializeConfig.addFilter(Map.class, new UnderLineToCamelCaseNameFilter());
         serializeConfig.addFilter(JSONObject.class, new UnderLineToCamelCaseNameFilter());
-        json = JSON.toJSONString(object, serializeConfig);
+        json = JSON.toJSONString(object, serializeConfig, new ValueFilter() {
+            @Override
+            public Object process(Object object, String key, Object value) {
+                return Objects.requireNonNullElse(value, "");
+            }
+        });
         // 不启用jsonpath来解决循环依赖引用$ref
         //json = JSON.toJSONString(object, SerializerFeature.DisableCircularReferenceDetect);
         System.out.println(json);
 
+        // 深拷贝
+        // 生成包含@type的JSON，便于反序列化时精准还原类型
+        String json1 = JSON.toJSONString(object, serializeConfig, SerializerFeature.WriteClassName);
+        TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {
+        };
+        ParserConfig parserConfig1 = new ParserConfig();
+        parserConfig1.setAutoTypeSupport(true);
+        // ParserConfig.getGlobalInstance().setAutoTypeSupport(true); // 全局显式启用 AutoType （不推荐生产环境）
+        // parserConfig1.addAccept("com.bajins.demo");
+        Map<String, Object> o = JSON.parseObject(json1, typeReference.getType(), parserConfig1);
     }
 
     /**

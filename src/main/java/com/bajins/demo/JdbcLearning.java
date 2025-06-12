@@ -62,5 +62,54 @@ public class JdbcLearning {
                 columns.add(column);
             }
         }*/
+
+        /*SQLStatementParser sqlStatementParser = SQLParserUtils.createSQLStatementParser(sql.replaceAll("\\{|\\}", ""),
+                DbType.postgresql);
+        SQLStatement statement = sqlStatementParser.parseStatement();
+
+        // 获取 SELECT 子句
+        SQLSelectQueryBlock queryBlock = (SQLSelectQueryBlock) ((SQLSelectStatement) statement).getSelect().getQuery();
+
+        // 提取查询字段
+        List<String> columnsWithAliases = new ArrayList<>();
+        for (SQLSelectItem selectItem : queryBlock.getSelectList()) {
+            SQLExpr expr = selectItem.getExpr();
+            String alias = selectItem.getAlias();
+            if (expr instanceof SQLPropertyExpr) {
+                SQLPropertyExpr spExpr = (SQLPropertyExpr) expr;
+                columnsWithAliases.add(spExpr.getOwnerName() + "." + spExpr.getName());
+            } else if (expr instanceof SQLIdentifierExpr) {
+                SQLIdentifierExpr siExpr = (SQLIdentifierExpr) expr;
+                columnsWithAliases.add(siExpr.getName());
+            } else {
+                columnsWithAliases.add(expr.toString());
+            }
+        }
+        System.out.println("Columns with aliases: " + columnsWithAliases);*/
+
+        /*try {
+            Select select = (Select) CCJSqlParserUtil.parse(sqlBuilder.toString().replaceAll("\\{|\\}", ""));
+            PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+            List<SelectItem> selectItems = plainSelect.getSelectItems();
+
+            for (SelectItem selectItem : selectItems) {
+                if (selectItem instanceof SelectExpressionItem) {
+                    SelectExpressionItem expressionItem = (SelectExpressionItem) selectItem;
+                    Expression expression = expressionItem.getExpression();
+                    Alias alias = expressionItem.getAlias();
+
+                    String cn = expression instanceof Column ? ((Column) expression).getColumnName()
+                            : expression.toString();
+                    String aliasName = alias != null ? alias.getName() : cn;
+
+                    System.out.println("Column: " + cn + ", Alias: " + aliasName);
+                } else {
+                    System.out.println("Column: " + selectItem.toString());
+                }
+            }
+
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+        }*/
     }
 }
