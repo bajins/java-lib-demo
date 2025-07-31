@@ -236,9 +236,6 @@ public class SpringUtilLearning {
         //org.springframework.cglib.beans.BeanCopier.create().copy();
         //BeanUtils.copyProperties(Object source, Object target, String... ignoreProperties); // 浅拷贝
 
-        //SerializationUtils.serialize() // 深拷贝
-        //SerializationUtils.deserialize()
-
         // 二元组
         Pair<String, String> of = Pair.of("goodsBeans", "totalProperty");
         System.out.println(of.getFirst());
