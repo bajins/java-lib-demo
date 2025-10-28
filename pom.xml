@@ -495,6 +495,27 @@
         <!--=========================== 模拟数据 end ===========================-->
 
 
+        <!--=========================== RapidOcr start ===========================-->
+        <!-- https://mvnrepository.com/artifact/com.github.jsonzou/jmockdata -->
+        <dependency>
+            <groupId>io.github.mymonstercat</groupId>
+            <artifactId>rapidocr</artifactId>
+            <version>0.0.7</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mymonstercat</groupId>
+            <artifactId>rapidocr-onnx-platform</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+        <!--=========================== RapidOcr end ===========================-->
+
+
         <!--=========================== 测试 start ===========================-->
         <dependency>
             <groupId>junit</groupId>
